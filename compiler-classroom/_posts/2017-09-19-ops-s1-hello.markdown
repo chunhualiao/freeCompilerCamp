@@ -26,18 +26,51 @@ Code snippets are shown in one of three ways throughout this environment:
 1. Code that looks like `this` is sample code snippets that is usually part of an explanation.
 2. Code that appears in box like the one below can be clicked on and it will automatically be typed in to the appropriate terminal window:
 ```.term1
-uname -a
+cd ompparser && vim omplexer.ll
 ```
+
 3. Code appearing in windows like the one below is code that you should type in yourself. Usually there will be a unique ID or other bit your need to enter which we cannot supply. Items appearing in <> are the pieces you should substitute based on the instructions.
 ```
 docker container start <container ID>
 ```
 
-## 1.0 Running your first container
-It's time to get your hands dirty! As with all things technical, a "hello world" app is good place to start. Type or click the code below to run your first Docker container:
+In the docker environment, the source code of ompparser is provided by default as well as the related tools needed. You can start right away!
+Our very first task is to add the support to a new clause ```HELLO``` in the lexer.
+
+## Step 1
+First, let's enter the ```ompparser``` folder to look around. There are bunch of files there. For now only two of them will be modified for our goal.
 ```.term1
-docker container run hello-world
+cd ompparser
 ```
+
+## Step 2
+Then, the lexer needs to recognize the input "hello" and convert it to a token ```HELLO```. The token will be required by the parser later. We'll open the lexer file and add a simple line to do that.
+```.term1
+vim omplexer.yy
+```
+The line below should be added into the block of lexering rules. The order of rules matter. For now we don't need to care much details about that. Please copy and paste the content below line 25. After editing, press ```esc```, input ```:wq``` and press ```enter``` to save and quit the editor.
+```
+hello {printf("HELLO is caught.\n"); return HELLO;}
+```
+
+## Step 3
+To use the token, we also need to declare it in the parser file ```ompparser.yy```.
+```.term1
+vim ompparser.yy
+```
+Add the following code below line 30 in the block of token declaration.
+```
+%token HELLO
+```
+Again, we need to press ```esc```, input ```:wq``` and press ```enter``` to save and quit the editor.
+
+## Step 4
+That's it! All necessary changes are made. Let's compile and run to check the result.
+```.term1
+make -s && ./main
+```
+Now you can see the new keyword ```hello``` is recognized by the lexer. Good job!
+
 
 That's it: your first container. The *hello-world* container output tells you a bit about what just happened. Essentially, the Docker engine running in your terminal tried to find an **image** named hello-world. Since you just got started there are no images stored locally (`Unable to find image...`) so Docker engine goes to its default **Docker registry**, which is [Docker Store](https://store.docker.com), to look for an image named "hello-world". It finds the image there, pulls it down, and then runs it in a container. And hello-world's only function is to output the text you see in your terminal, after which the container exits.
 

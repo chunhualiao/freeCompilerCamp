@@ -29,6 +29,8 @@ Give Docker a try with these three beginning tutorials:
 
 * [Your First Linux Containers](/ops-s1-hello): In this lab you will explore the basics of running containers: pulling images from a registry, running an containerized application, and container instances and isolation.
 
+* [How to build OpenMP in LLVM with offloading support](/llvm-openmp-build): In this lab we will be explaining the steps to first build llvm-8.0.0 with clang-8.0.0 and then use it to build openmp-8.0.0 with offloading support.
+
 * [Customizing Docker Images](/ops-s1-images): Move on to building your own custom Docker images and explore the Docker concept of image layers and the Dockerfile.
 
 * [Deploy and Managing Multiple Containers](/ops-s1-swarm-intro): Real apps consist of multiple components. In this lab you will begin to explore running multiple services as a single stack with Docker Swarm.

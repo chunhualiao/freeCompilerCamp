@@ -22,6 +22,25 @@
           {% include main.scss %}
           {% endcapture %}
           {{ include_to_scssify | scssify }}
+
+          a.top:link, a.top:visited {
+            background-color: #ff9933;
+            color: white;
+            padding: 10px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+          }
+
+          a.top:hover, a.top:active {
+            background-color: red;
+          }
+
+          td, th {
+            text-align: left;
+            padding: 8px;
+          }
+
 </style>  
 
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">

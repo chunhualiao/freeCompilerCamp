@@ -1,10 +1,10 @@
 ---
 layout: post
 title:  "How to build OpenMP in LLVM with offloading support"
-author: "@alokmishra"
+author: "@alokmishra.besu"
 date:   2019-06-26
 categories: beginner
-tags: [llvm,clamg,openmp,gpu,offloading]
+tags: [llvm,clang,openmp,gpu,offloading]
 ---
 
 Llvm-8.0.0 now has GPU offloading support in their OpenMP implementation. But building and using this offloading support can sometimes be confusing. I have tried several ways of building LLVM, and failed several times. Finally I found a way which works for me. Personally I prefer to first build and install llvm/clang, and then use this installation to build OpenMP-8.0.0. This is the way which worked for me. In this tutorial I will be explaining the steps to first build llvm-8.0.0 with clang-8.0.0 and then use it to build openmp-8.0.0 with offloading support.

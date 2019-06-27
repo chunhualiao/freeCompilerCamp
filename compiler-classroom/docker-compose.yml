@@ -2,13 +2,25 @@ version: '3'
 
 services:
 
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - 11801:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+
   jekyll:
     image: jekyll/jekyll:3
     volumes:
       - ./:/srv/jekyll
-    ports:
-      - 4000:4000
+        #ports:
+        #- 4000:4000
+        #expose:
+        #- 4000
     command: ["jekyll", "serve"]
+    environment:
+      - "VIRTUAL_HOST=classroom.kaffeineko.com"
+      - "VIRTUAL_PORT=4000"
 
 #This service is just for building the site
   build:

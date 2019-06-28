@@ -15,6 +15,32 @@ RUN mkdir -p /opt && cd /opt && \
     ./configure && make install LDFLAGS=-lintl && \
     rm -rf httping-2.5
 
+# customize packages
+ENV LLVM_SRC /opt/llvm_src
+ENV LLVM_PATH /opt/llvm_install
+RUN apk add --no-cache cmake gcc g++
+RUN mkdir -p /opt/llvm_src && \
+    mkdir -p /opt/llvm_install && \
+    mkdir -p /opt/llvm_src/build && \
+    cd /opt/llvm_src && \
+    wget http://releases.llvm.org/8.0.0/llvm-8.0.0.src.tar.xz && \
+    tar -xf llvm-8.0.0.src.tar.xz && \
+    cd llvm-8.0.0.src/tools && \
+    wget http://releases.llvm.org/8.0.0/cfe-8.0.0.src.tar.xz && \
+    tar -xf cfe-8.0.0.src.tar.xz && \
+    cd /opt/llvm_src/build && \
+    cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH $LLVM_SRC/llvm-8.0.0.src && \
+    make -j4 && \
+    make install
+
+ENV PATH $LLVM_PATH:$PATH
+ENV LD_LIBRARY_PATH $LLVM_PATH/libexec:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH $LLVM_PATH/lib:$LD_LIBRARY_PATH
+ENV LIBRARY_PATH $LLVM_PATH/libexec:$LIBRARY_PATH
+ENV LIBRARY_PATH $LLVM_PATH/lib:$LIBRARY_PATH
+ENV MANPATH $LLVM_PATH/share/man:$MANPATH
+ENV C_INCLUDE_PATH $LLVM_PATH/include:$C_INCLUDE_PATH
+ENV CPLUS_INCLUDE_PATH $LLVM_PATH/include:CPLUS_INCLUDE_PATH
 
 ENV DOCKERAPP_VERSION=v0.6.0
 ENV COMPOSE_VERSION=1.23.2

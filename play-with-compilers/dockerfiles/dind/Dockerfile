@@ -1,7 +1,94 @@
-ARG VERSION=docker:stable-dind
-FROM ${VERSION}
+FROM ubuntu:16.04
 
-RUN apk add --no-cache git tmux py2-pip apache2-utils vim build-base gettext-dev curl bash-completion bash util-linux jq openssh openssl tree
+RUN apt-get install ca-certificates
+
+# set up nsswitch.conf for Go's "netgo" implementation (which Docker explicitly uses)
+# - https://github.com/docker/docker-ce/blob/v17.09.0-ce/components/engine/hack/make.sh#L149
+# - https://github.com/golang/go/blob/go1.9.1/src/net/conf.go#L194-L275
+# - docker run --rm debian:stretch grep '^hosts:' /etc/nsswitch.conf
+RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
+
+ENV DOCKER_CHANNEL stable
+ENV DOCKER_VERSION 18.09.7
+
+RUN set -eux; \
+    # this "case" statement is generated via "update.sh"
+    dpkgArch=“$(dpkg --print-architecture)”; \
+    case "$dpkgArch" in \
+    # amd64
+        x86_64) dockerArch='x86_64' ;; \
+    # arm32v6
+        armhf) dockerArch='armel' ;; \
+    # arm32v7
+        armv7) dockerArch='armhf' ;; \
+    # arm64v8
+        aarch64) dockerArch='aarch64' ;; \
+    *) echo >&2 "error: unsupported architecture ($dpkgArch)"; exit 1 ;;\
+    esac; \
+
+    if ! wget -O docker.tgz "https://download.docker.com/linux/static/${DOCKER_CHANNEL}/${dockerArch}/docker-${DOCKER_VERSION}.tgz"; then \
+        echo >&2 "error: failed to download 'docker-${DOCKER_VERSION}' from '${DOCKER_CHANNEL}' for '${dockerArch}'"; \
+        exit 1; \
+    fi; \
+    \
+    tar --extract \
+        --file docker.tgz \
+        --strip-components 1 \
+        --directory /usr/local/bin/ \
+    ; \
+    rm docker.tgz; \
+    \
+    dockerd --version; \
+    docker --version
+
+COPY modprobe.sh /usr/local/bin/modprobe
+COPY docker-entrypoint.sh /usr/local/bin/
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["sh"]
+
+RUN set -eux; \
+    apt-get install \
+    btrfs-progs \
+    e2fsprogs \
+    e2fsprogs-extra \
+    iptables \
+    xfsprogs \
+    xz \
+    pigz \
+; \
+
+# only install zfs if it's available for the current architecture
+if zfs="$(apt-cache policy zfs | grep Candidate | grep none)" && [ -z "$zfs" ]; then \
+    apt-get install zfs; \
+fi
+
+# set up subuid/subgid so that "--userns-remap=default" works out-of-the-box
+RUN set -x \
+    && addgroup -S dockremap \
+    && adduser -S -G dockremap dockremap \
+    && echo 'dockremap:165536:65536' >> /etc/subuid \
+    && echo 'dockremap:165536:65536' >> /etc/subgid
+
+
+
+# https://github.com/docker/docker/tree/master/hack/dind
+ENV DIND_COMMIT 37498f009d8bf25fbb6199e8ccd34bed84f2874b
+
+RUN set -eux; \
+    wget -O /usr/local/bin/dind "https://raw.githubusercontent.com/docker/docker/${DIND_COMMIT}/hack/dind"; \
+    chmod +x /usr/local/bin/dind
+
+COPY dockerd-entrypoint.sh /usr/local/bin/
+
+VOLUME /var/lib/docker
+EXPOSE 2375
+
+
+ENTRYPOINT ["dockerd-entrypoint.sh"]
+CMD []
+
+RUN apt-get install git tmux python-pip apache2-utils vim build-essential gettext-dev curl bash-completion bash util-linux jq openssh-client openssl tree cmake man
 
 ENV GOPATH /root/go
 ENV PATH $PATH:$GOPATH
@@ -18,11 +105,10 @@ RUN mkdir -p /opt && cd /opt && \
 # customize packages
 ENV LLVM_SRC /opt/llvm_src
 ENV LLVM_PATH /opt/llvm_install
-RUN apk add --no-cache cmake gcc g++
-RUN mkdir -p /opt/llvm_src && \
-    mkdir -p /opt/llvm_install && \
-    mkdir -p /opt/llvm_src/build && \
-    cd /opt/llvm_src && \
+
+RUN mkdir -p $LLVM_SRC/build && \
+    mkdir -p $LLVM_PATH && \
+    cd $LLVM_SRC && \
     wget http://releases.llvm.org/8.0.0/llvm-8.0.0.src.tar.xz && \
     tar -xf llvm-8.0.0.src.tar.xz && \
     cd llvm-8.0.0.src/tools && \
@@ -33,7 +119,9 @@ RUN mkdir -p /opt/llvm_src && \
     make -j4 && \
     make install
 
-ENV PATH $LLVM_PATH:$PATH
+
+
+ENV PATH $LLVM_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $LLVM_PATH/libexec:$LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH $LLVM_PATH/lib:$LD_LIBRARY_PATH
 ENV LIBRARY_PATH $LLVM_PATH/libexec:$LIBRARY_PATH
@@ -47,7 +135,6 @@ ENV COMPOSE_VERSION=1.23.2
 # Install Compose and Machine
 RUN pip install docker-compose==${COMPOSE_VERSION}
 
-
 RUN curl -fsSL --output /tmp/docker-app-linux.tar.gz https://github.com/docker/app/releases/download/${DOCKERAPP_VERSION}/docker-app-linux.tar.gz \
     && tar xf "/tmp/docker-app-linux.tar.gz" -C /usr/bin/ && mv /usr/bin/docker-app-linux /usr/bin/docker-app && rm /tmp/docker-app-linux.tar.gz
 
@@ -55,6 +142,7 @@ RUN curl -fsSL --output /tmp/docker-app-linux.tar.gz https://github.com/docker/a
 RUN mkdir /etc/bash_completion.d \
     && curl https://raw.githubusercontent.com/docker/cli/master/contrib/completion/bash/docker -o /etc/bash_completion.d/docker \
     && sed -i "s/ash/bash/" /etc/passwd
+
  
 # Replace modprobe with a no-op to get rid of spurious warnings
 # (note: we can't just symlink to /bin/true because it might be busybox)
@@ -76,6 +164,7 @@ RUN mkdir -p /var/run/pwd/certs && mkdir -p /var/run/pwd/uploads \
     && mkdir ~/.ssh && ssh-keygen -N "" -t rsa -f ~/.ssh/id_rsa \
     && cat ~/.ssh/id_rsa.pub > ~/.ssh/authorized_keys
 
+
 # Remove IPv6 alias for localhost and start docker in the background ...
 CMD cat /etc/hosts >/etc/hosts.bak && \
     sed 's/^::1.*//' /etc/hosts.bak > /etc/hosts && \
@@ -90,3 +179,5 @@ CMD cat /etc/hosts >/etc/hosts.bak && \
     dockerd &>/docker.log & \
     while true ; do script -q -c "/bin/bash -l" /dev/null ; done
 # ... and then put a shell in the foreground, restarting it if it exits
+
+

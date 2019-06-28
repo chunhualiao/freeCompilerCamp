@@ -21,21 +21,23 @@ RUN apt-get -y install httping
 # customize packages
 
 # install LLVM
-ENV LLVM_SRC /opt/llvm_src
-ENV LLVM_PATH /opt/llvm_install
+ENV LLVM_SRC /opt/source/llvm_src
+ENV LLVM_PATH /opt/install/llvm_install
+ENV LLVM_BUILD /opt/build/llvm_build
 
-#RUN mkdir -p $LLVM_SRC/build && \
-#    mkdir -p $LLVM_PATH && \
-#    cd $LLVM_SRC && \
-#    wget http://releases.llvm.org/8.0.0/llvm-8.0.0.src.tar.xz && \
-#    tar -xf llvm-8.0.0.src.tar.xz && \
-#    cd llvm-8.0.0.src/tools && \
-#    wget http://releases.llvm.org/8.0.0/cfe-8.0.0.src.tar.xz && \
-#    tar -xf cfe-8.0.0.src.tar.xz && \
-#    cd /opt/llvm_src/build
-#    cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH $LLVM_SRC/llvm-8.0.0.src
-#    make -j4 && \
-#    make install
+RUN mkdir -p $LLVM_SRC && \
+    mkdir -p $LLVM_PATH && \
+	mkdir -p $LLVM_BUILD && \
+    cd $LLVM_SRC && \
+    wget http://releases.llvm.org/8.0.0/llvm-8.0.0.src.tar.xz && \
+    tar -xf llvm-8.0.0.src.tar.xz && \
+    cd llvm-8.0.0.src/tools && \
+    wget http://releases.llvm.org/8.0.0/cfe-8.0.0.src.tar.xz && \
+    tar -xf cfe-8.0.0.src.tar.xz && \
+    cd $LLVM_BUILD && \
+    cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH $LLVM_SRC/llvm-8.0.0.src && \
+    make -j4 && \
+    make install
 
 ENV PATH $LLVM_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $LLVM_PATH/libexec:$LD_LIBRARY_PATH
@@ -97,7 +99,7 @@ RUN apt-get install -y \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/cache/*
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
-ENV LD_LIBRARY_PATH /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH $JAVA_HOME/jre/lib/amd64/server:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 
 
 ENV DOCKERAPP_VERSION=v0.6.0

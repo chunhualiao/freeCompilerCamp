@@ -19,7 +19,6 @@ RUN set -eux; \
     case "$dpkgArch" in \
     # amd64
         amd64) dockerArch='x86_64' ;; \
-        x86_64) dockerArch='x86_64' ;; \
     # arm32v6
         armhf) dockerArch='armel' ;; \
     # arm32v7

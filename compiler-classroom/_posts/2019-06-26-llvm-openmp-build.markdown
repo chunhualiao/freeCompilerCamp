@@ -200,11 +200,11 @@ tar -xf openmp-8.0.0.src.tar.xz
 ### B.3 Build with make
 Goto openmp-8.0.0.src
 ```.term1
-$ cd openmp-8.0.0.src
+cd openmp-8.0.0.src
 ```
 Create a build directory and get into it
 ```.term1
-$ mkdir build && cd build
+mkdir build && cd build
 ```
 OpenMP building is quite small compared to llvm/clang. We can still use the ninja build system and TMPDIR to speedup our build process, but it won't make much of a difference.
 
@@ -215,16 +215,16 @@ CLANG_OPENMP_NVPTX_DEFAULT_ARCH sets the default architecture when not passing t
 LIBOMPTARGET_NVPTX_COMPUTE_CAPABILITIES applies to the runtime libraries: It specifies a list of architectures that the libraries will be built for. This is an important parameter. As we cannot run on GPUs without a compatible runtime, we should pass all architectures we care about. Also, please note that the values are passed without the dot, so compute capability 7.0 becomes 70. We can also build for multiple compute capabilities by separating them with a comma. For instance, if we want to build for compute capabilities 3.5, 6.0 and 7.0, then use the parameter as -DLIBOMPTARGET_NVPTX_COMPUTE_CAPABILITIES=35,60,70. We can only build for compute capabilities over 3.5
 
 ```.term1
-$ cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH -DCMAKE_C_COMPILER=$LLVM_PATH\bin\clang -DCMAKE_CXX_COMPILER=$LLVM_PATH\bin\clang++ -DCLANG_OPENMP_NVPTX_DEFAULT_ARCH=sm_XX  -DLIBOMPTARGET_NVPTX_COMPUTE_CAPABILITIES=XX[,XX] ..
+cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH -DCMAKE_C_COMPILER=$LLVM_PATH\bin\clang -DCMAKE_CXX_COMPILER=$LLVM_PATH\bin\clang++ -DCLANG_OPENMP_NVPTX_DEFAULT_ARCH=sm_XX  -DLIBOMPTARGET_NVPTX_COMPUTE_CAPABILITIES=XX[,XX] ..
 ```
 As always make will build OpenMP
 
 ```.term1
-$ make -j<NUM_OF_PROCESSOR>
+make -j<NUM_OF_PROCESSOR>
 ```
  and *make install* will install the built files into the assigned path, here $LLVM_PATH.
 ```.term1
-$ make install
+make install
 ```
 
 ## C. Compiling code with offloading support

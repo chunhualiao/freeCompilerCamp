@@ -5,7 +5,7 @@ services:
   nginx-proxy:
     image: jwilder/nginx-proxy
     ports:
-      - 11801:80
+      - 5020:80
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock
 
@@ -19,7 +19,7 @@ services:
         #- 4000
     command: ["jekyll", "serve"]
     environment:
-      - "VIRTUAL_HOST=classroom.kaffeineko.com"
+      - "VIRTUAL_HOST=classroom.freecompilercamp.org"
       - "VIRTUAL_PORT=4000"
 
 #This service is just for building the site

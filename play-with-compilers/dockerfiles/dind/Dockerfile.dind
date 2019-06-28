@@ -19,6 +19,8 @@ ENV PATH $PATH:$GOPATH
 RUN apt-get -y install httping
 
 # customize packages
+
+# install LLVM
 ENV LLVM_SRC /opt/llvm_src
 ENV LLVM_PATH /opt/llvm_install
 
@@ -35,8 +37,6 @@ ENV LLVM_PATH /opt/llvm_install
 #    make -j4 && \
 #    make install
 
-
-
 ENV PATH $LLVM_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $LLVM_PATH/libexec:$LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH $LLVM_PATH/lib:$LD_LIBRARY_PATH
@@ -45,6 +45,60 @@ ENV LIBRARY_PATH $LLVM_PATH/lib:$LIBRARY_PATH
 ENV MANPATH $LLVM_PATH/share/man:$MANPATH
 ENV C_INCLUDE_PATH $LLVM_PATH/include:$C_INCLUDE_PATH
 ENV CPLUS_INCLUDE_PATH $LLVM_PATH/include:CPLUS_INCLUDE_PATH
+
+# install ROSE
+RUN apt-get install -y \
+        apt-utils \
+        dialog \
+        python-software-properties \
+        software-properties-common && \
+    apt-get install -y openjdk-8-jdk && \
+    apt-get install -y \ 
+        autoconf \
+        automake \
+        autotools-dev \
+        bc \
+        binutils \
+        bison \
+        build-essential \
+        cmake \
+        cpufrequtils \
+        curl \
+        device-tree-compiler \
+        dkms \
+        doxygen \
+        flex \
+        gawk \
+        gcc-multilib \
+        gdb \
+        gfortran \
+        ghostscript \
+        git \
+        gperf \
+        graphviz \
+        libboost-all-dev \
+        libgmp-dev \
+        libhpdf-dev \
+        libmpc-dev \
+        libmpfr-dev \
+        libtool \
+        libxml2-dev \
+        patchutils \
+        perl-doc \
+        python3-dev \
+        sqlite \
+        texinfo \
+        unzip \
+        vim \
+        wget \
+        zip \
+        zlib1g \
+        zlib1g-dev && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/cache/*
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+ENV LD_LIBRARY_PATH /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+
 
 ENV DOCKERAPP_VERSION=v0.6.0
 ENV COMPOSE_VERSION=1.23.2

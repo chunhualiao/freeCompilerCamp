@@ -48,14 +48,20 @@ ENV MANPATH $LLVM_PATH/share/man:$MANPATH
 ENV C_INCLUDE_PATH $LLVM_PATH/include:$C_INCLUDE_PATH
 ENV CPLUS_INCLUDE_PATH $LLVM_PATH/include:CPLUS_INCLUDE_PATH
 
-# install ROSE
+# Install ROSE
+# Prepare installation
+ENV ROSE_SRC /opt/source/rose_src
+ENV ROSE_PATH /opt/install/rose_install
+ENV ROSE_BUILD /opt/build/rose_build
 RUN apt-get install -y \
         apt-utils \
         dialog \
         python-software-properties \
-        software-properties-common && \
-    apt-get install -y openjdk-8-jdk && \
-    apt-get install -y \ 
+        software-properties-common
+# Install Java JDK
+RUN apt-get install -y openjdk-8-jdk
+# Install dependency
+RUN apt-get install -y \
         autoconf \
         automake \
         autotools-dev \
@@ -100,7 +106,22 @@ RUN apt-get install -y \
     rm -rf /var/cache/*
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 ENV LD_LIBRARY_PATH $JAVA_HOME/jre/lib/amd64/server:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-
+RUN mkdir -p $ROSE_PATH && \
+    mkdir -p $ROSE_BUILD && \
+    git clone https://github.com/rose-compiler/rose.git $ROSE_SRC && \
+    cd $ROSE_SRC && \
+    ./build && \
+    cd $ROSE_BUILD && \
+    $ROSE_SRC/configure --prefix=$ROSE_PATH --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-languages=c,c++,fortran --enable-projects-directory --disable-tests-directory --disable-tutorial-directory --enable-edg_version=5.0
+# Compile ROSE
+RUN cd $ROSE_BUILD && \
+    make core -j4 && \
+    make install-core
+# Setup environment
+ENV PATH $ROSE_PATH/bin:$PATH
+ENV LD_LIBRARY_PATH $ROSE_PATH/lib:$LD_LIBRARY_PATH
+ENV LIBRARY_PATH $ROSE_PATH/lib:$LIBRARY_PATH
+ENV MANPATH $ROSE_PATH/share/man:$MANPATH
 
 ENV DOCKERAPP_VERSION=v0.6.0
 ENV COMPOSE_VERSION=1.23.2

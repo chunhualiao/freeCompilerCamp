@@ -39,13 +39,15 @@ Code snippets are shown in one of three ways throughout this environment:
 1. Code that looks like `this` is sample code snippets that is usually part of an explanation.
 2. Code that appears in box like the one below can be clicked on and it will automatically be typed in to the appropriate terminal window:
 ```.term1
-cd ompparser && vim omplexer.ll
+vim omplexer.ll
 ```
 
 3. Code appearing in windows like the one below is code that you should type in yourself. Usually there will be a unique ID or other bit your need to enter which we cannot supply. Items appearing in <> are the pieces you should substitute based on the instructions.
 ```
 docker container start <container ID>
 ```
+
+LLVM is already built and installed ($LLVM_PATH) in this environment. The LLVM source code can be found on $LLVM_SRC. A normal LLVM build might take a couple of hours to complete. The next section (section A) is for people who want to learn about how to install LLVM. If you  are just interested in building OpenMP in LLVM please go to [Section B](#openmp). 
 
 ## A. Building llvm-8.0.0 with CMake
 **[CMake](http://www.cmake.org/)**  is a cross-platform build-generator tool. CMake does not build the project, it generates the files needed by our build tool *(GNU make, ninja, etc.)* for building LLVM.
@@ -111,16 +113,16 @@ For boosting performance sometimes we can use the /dev/shm as our temporary dire
 ```.term1
 export TMPDIR=/dev/shm 
 ```
-Once the required build files are created, we can start building using make. We can create as many threads as the number of processors. For instance, lassen LC system has 176 cores on a node. So on lassen we can run this command as make -j176. This will speedup the build process.
-```
-make -j<NUM_OF_PROCESSOR>
+Once the required build files are created, we can start building using make. We can create as many threads as the number of processors. For instance, suppose your system has 4 cores on a node. So on this system we can run this command as make -j4. This will speedup the build process. ```WARNING``` - the make command will take a couple of hours to complete
+```.term
+make -j4
 ```
 make install installs all the built llvm/clang files to the LLVM_PATH location.
 
 ```.term1
 make install
 ```
-### A.5 Build with Ninja
+### A.5 Build with Ninja (Optional)
 **[Ninja](https://ninja-build.org)** is much faster than make. Where other build systems are high-level languages Ninja aims to be an assembler. Ninja build files are human-readable but not especially convenient to write by hand. These constrained build files allow Ninja to evaluate incremental builds quickly.
 
 To build ninja supported files, we use the option -G Ninja
@@ -181,7 +183,7 @@ export CLANG_LIB=$LLVM_PATH/lib
 ```
 
 
-## B. Building OpenMP with CMake
+## <a name="openmp"></a> B. Building OpenMP with CMake
 Once llvm is installed building OpenMP is pretty straight forward. Here also we can use ninja or make. Following tutorial is only for make build system.
 
 ### B.1 Prerequisite
@@ -215,12 +217,12 @@ CLANG_OPENMP_NVPTX_DEFAULT_ARCH sets the default architecture when not passing t
 LIBOMPTARGET_NVPTX_COMPUTE_CAPABILITIES applies to the runtime libraries: It specifies a list of architectures that the libraries will be built for. This is an important parameter. As we cannot run on GPUs without a compatible runtime, we should pass all architectures we care about. Also, please note that the values are passed without the dot, so compute capability 7.0 becomes 70. We can also build for multiple compute capabilities by separating them with a comma. For instance, if we want to build for compute capabilities 3.5, 6.0 and 7.0, then use the parameter as -DLIBOMPTARGET_NVPTX_COMPUTE_CAPABILITIES=35,60,70. We can only build for compute capabilities over 3.5
 
 ```.term1
-cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH -DCMAKE_C_COMPILER=$LLVM_PATH\bin\clang -DCMAKE_CXX_COMPILER=$LLVM_PATH\bin\clang++ -DCLANG_OPENMP_NVPTX_DEFAULT_ARCH=sm_XX  -DLIBOMPTARGET_NVPTX_COMPUTE_CAPABILITIES=XX[,XX] ..
+cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH -DCMAKE_C_COMPILER=$LLVM_PATH/bin/clang -DCMAKE_CXX_COMPILER=$LLVM_PATH/bin/clang++ -DCLANG_OPENMP_NVPTX_DEFAULT_ARCH=sm_35  -DLIBOMPTARGET_NVPTX_COMPUTE_CAPABILITIES=35 ..
 ```
 As always make will build OpenMP
 
 ```.term1
-make -j<NUM_OF_PROCESSOR>
+make -j4
 ```
  and *make install* will install the built files into the assigned path, here $LLVM_PATH.
 ```.term1

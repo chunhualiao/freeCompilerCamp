@@ -89,6 +89,7 @@ RUN apt-get install -y \
         libhpdf-dev \
         libmpc-dev \
         libmpfr-dev \
+        libomp-dev \
         libtool \
         libxml2-dev \
         patchutils \
@@ -112,7 +113,7 @@ RUN mkdir -p $ROSE_PATH && \
     cd $ROSE_SRC && \
     ./build && \
     cd $ROSE_BUILD && \
-    $ROSE_SRC/configure --prefix=$ROSE_PATH --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-languages=c,c++,fortran --enable-projects-directory --disable-tests-directory --disable-tutorial-directory --enable-edg_version=5.0
+    $ROSE_SRC/configure --prefix=$ROSE_PATH --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-languages=c,c++,fortran --enable-projects-directory --disable-tests-directory --disable-tutorial-directory --enable-edg_version=5.0 --with-gomp_omp_runtime_library=/usr/lib/gcc/x86_64-linux-gnu/5
 # Compile ROSE
 RUN cd $ROSE_BUILD && \
     make core -j4 && \

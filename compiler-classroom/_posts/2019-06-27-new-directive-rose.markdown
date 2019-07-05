@@ -18,7 +18,7 @@ cd $ROSE_SRC/src/frontend/SageIII
 ## Step 2
 Then, the lexer needs to recognize the input "hello" and convert it to a token ```HELLO```. The token will be required by the parser later. We'll open the lexer file and add a simple line to do that.
 ```.term1
-vim omplexer.yy
+vim omplexer.ll
 ```
 The line below should be added into the block of lexering rules. The order of rules matter. For now we don't need to care much details about that. Please copy and paste the content below line 67. After editing, press ```esc```, input ```:wq``` and press ```enter``` to save and quit the editor.
 ```

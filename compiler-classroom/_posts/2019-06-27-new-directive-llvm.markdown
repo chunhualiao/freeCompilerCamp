@@ -23,9 +23,9 @@ Now let us update the compiler, such that it just identifies the new directive. 
 2. *ParseOpenMP.cpp* -- which implements parsing of all OpenMP directives and clauses.
 
 ## Step 2 - Define the new directive
-To define the new directive we will modify the file `OpenMPKinds.def`, located in `include/clang/Basic`. So open the file using your favorite editor. In this tutorial we will be using the vi editor.
+To define the new directive we will modify the file `OpenMPKinds.def`, located in `include/clang/Basic`. So open the file using your favorite editor. In this tutorial we will be using the vim editor.
 ```.term1
-vi include/clang/Basic/OpenMPKinds.def
+vim include/clang/Basic/OpenMPKinds.def
 ```
 
 Now in this file go towards the end (to line 891 or before `#undef OPENMP_DIRECTIVE_EXT` is called) and add the following line
@@ -39,8 +39,8 @@ This way we are able to define the new directive `#pragma omp hello`.
 
 ## Step 3 - Implements parsing
 To implement the parsing of this new directive we will modify the file `ParseOpenMP.cpp`, located in `lib/Parse`. So open the file using your favorite editor.
-```.term
-vi lib/Parse/ParseOpenMP.cpp
+```.term1
+vim lib/Parse/ParseOpenMP.cpp
 ```
 
 Now in this file go to the function `ParseOpenMPDeclarativeOrExecutableDirective` and add the new case for the hello directive. Identify where the case for `OMPD_parallel` is defined and add your new case right before it. Here we will be reusing the `OMPD_parallel` code, so do not break your case.
@@ -57,21 +57,21 @@ To support the std::cout include `iostream` at the start of the file.
 That's it for now. Now let us build and test our code.
 
 ## Step 4 - Building LLVM and testing code
-To build `LLVM` go to the `LLVM_BUILD` directory and run make
+To build `LLVM` go to the `LLVM_BUILD` directory and run make. We are redirecting the output of make to /dev/null to have a clean output. It will still show errors.
 
-```.term
+```.term1
 cd $LLVM_BUILD && make -j8 install > /dev/null
 ```
 
 Once the code builds successfully and is installed, its time to test a small program.
 
-```.term
+```.term1
 cd $EXAMPLE_DIR && cat test_hello.c
 ```
 
 You should get the output of the file `test_hello.c` which uses the `hello` directive. Build this file using our clang compiler.
 
-```.term
+```.term1
 clang -fopenmp test_hello.c
 ```
 

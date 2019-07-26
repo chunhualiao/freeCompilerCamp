@@ -38,19 +38,20 @@ In our current state we are not dealing with any clause associated with metadire
 This way we are able to define the new directive `#pragma omp metadirective`.
 
 ## Step 3 - Implements parsing
-To implement the parsing of this new directive we will modify the file `ParseOpenMP.cpp`, located in `lib/Parse`. So open the file using your favorite editor.
+Before parsing the lexer will split the source code into multiple tokens. The parser will read these tokens and give a structural representation to them. To implement the parsing of this new directive we will modify the file `ParseOpenMP.cpp`, located in `lib/Parse`. So open the file using your favorite editor.
 ```.term1
 vim lib/Parse/ParseOpenMP.cpp
 ```
 
-Now in this file go to the function `ParseOpenMPDeclarativeOrExecutableDirective` and add the new case for the metadirective directive. Identify where the case for `OMPD_parallel` is defined and add your new case right before it. Here we will be reusing the `OMPD_parallel` code, so do not break your case.
+Now in this file go to the function `ParseOpenMPDeclarativeOrExecutableDirective`, identify the switch case (line 997) and add a new case for `OMPD_metadirective`. Here we will print out <span style="color:blue">**METADIRECTIVE is caught**</span> and the consume the token.
 ```
-  // Add new code here
-  case OMPD_metadirective:
+  switch (DKind) {
+  case OMPD_metadirective: {
     std::cout <<"METADIRECTIVE is caught\n";
-  // New code ends here. Use the body of OMPD_parallel for our case
-  case OMPD_parallel:
-
+    ConsumeToken();
+    ConsumeAnnotationToken();
+    break;
+  }
 ```
 To support the std::cout include `iostream` at the start of the file.
 
@@ -79,7 +80,8 @@ You should get an output `METADIRECTIVE is caught`.
 
 <span style="color:green">**Congratulations**</span> you were successfully able to add a new directive to OpenMP in clang compiler.
 
-## Step 5 - Semantic analysis
-In the above implementation we used the body of the `OMPD_parallel` case. Now we will implement our own parsing of the directive.
+## Step 5 - Identify Clause
+In the above implementation just identifies the `metadirective` token and does not factor in its clauses.
+There are two clause to metadirective - `when` and `default`.
 
 

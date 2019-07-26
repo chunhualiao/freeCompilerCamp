@@ -8,7 +8,7 @@ tags: [llvm,clang,openmp,directive]
 ---
 ### Features
 
-In this tutorial we will cover how to add a new OpenMP directive in clang/LLVM compiler. The goal of this tutorial is to add a new OpenMP directive hello (`#pragma omp hello`) which will give a failed message if the next statement is not a for loop.
+In this tutorial we will cover how to add a new OpenMP directive in clang/LLVM compiler. The goal of this tutorial is to add a new OpenMP directive -- metadirective (`#pragma omp metadirective [clause[[,]clause]...]`), defined in OpenMP Specification 5.0, that can specify multiple directive variants of which one may be conditionally selected to replace the metadirective based on the enclosing OpenMP context.
 
 ---
 
@@ -30,12 +30,12 @@ vim include/clang/Basic/OpenMPKinds.def
 
 Now in this file go towards the end (to line 891 or before `#undef OPENMP_DIRECTIVE_EXT` is called) and add the following line
 ```
-OPENMP_DIRECTIVE_EXT(hello, "hello")
+OPENMP_DIRECTIVE_EXT(metadirective, "metadirective")
 ```
 
-In our current example hello does not have any clause associated with it, so we do not need to define `OPENMP_HELLO_CLAUSE`.
+In our current state we are not dealing with any clause associated with metadirective, so we do not need to define `OPENMP_METADIRECTIVE_CLAUSE`.We will learn about adding clause later in the tutorial.
 
-This way we are able to define the new directive `#pragma omp hello`.
+This way we are able to define the new directive `#pragma omp metadirective`.
 
 ## Step 3 - Implements parsing
 To implement the parsing of this new directive we will modify the file `ParseOpenMP.cpp`, located in `lib/Parse`. So open the file using your favorite editor.
@@ -43,11 +43,11 @@ To implement the parsing of this new directive we will modify the file `ParseOpe
 vim lib/Parse/ParseOpenMP.cpp
 ```
 
-Now in this file go to the function `ParseOpenMPDeclarativeOrExecutableDirective` and add the new case for the hello directive. Identify where the case for `OMPD_parallel` is defined and add your new case right before it. Here we will be reusing the `OMPD_parallel` code, so do not break your case.
+Now in this file go to the function `ParseOpenMPDeclarativeOrExecutableDirective` and add the new case for the metadirective directive. Identify where the case for `OMPD_parallel` is defined and add your new case right before it. Here we will be reusing the `OMPD_parallel` code, so do not break your case.
 ```
   // Add new code here
-  case OMPD_hello:
-    std::cout <<"HELLO is caught\n";
+  case OMPD_metadirective:
+    std::cout <<"METADIRECTIVE is caught\n";
   // New code ends here. Use the body of OMPD_parallel for our case
   case OMPD_parallel:
 
@@ -63,23 +63,23 @@ To build `LLVM` go to the `LLVM_BUILD` directory and run make. We are redirectin
 cd $LLVM_BUILD && make -j8 install > /dev/null
 ```
 
-Once the code builds successfully and is installed, its time to test a small program.
+Once the code builds successfully and is installed, its time to test a small program. Let us create a new test file
 
 ```.term1
-cd $EXAMPLE_DIR && cat test_hello.c
+cd $EXAMPLE_DIR && echo -e "int main(){\n#pragma omp metadirective\n  for(int i=0; i<100; i++);\n  return 0;\n}" > test_metadirective.c
 ```
 
-You should get the output of the file `test_hello.c` which uses the `hello` directive. Build this file using our clang compiler.
+Now you have a new test file `test_metadirective.c` which uses the `metadirective` directive. Build this file using your clang compiler.
 
 ```.term1
-clang -fopenmp test_hello.c
+clang -fopenmp test_metadirective.c
 ```
 
-You should get an output `HELLO is caught`. Congratulations you were successfully able to add a new directive to OpenMP in clang compiler.
+You should get an output `METADIRECTIVE is caught`. 
+
+<span style="color:green">**Congratulations**</span> you were successfully able to add a new directive to OpenMP in clang compiler.
 
 ## Step 5 - Semantic analysis
 In the above implementation we used the body of the `OMPD_parallel` case. Now we will implement our own parsing of the directive.
-
-To parse a 
 
 

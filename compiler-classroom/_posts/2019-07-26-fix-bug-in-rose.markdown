@@ -15,9 +15,9 @@ This tutorial is to show how to fix a bug in ROSE compiler.
 Concepts in this exercise:
 # A. Overview
 
-# B. Building autoPar
+# B. Existing Bug
 
-# C. Usage Examples
+# C. Fix the Bug
 
 ---
 
@@ -42,7 +42,7 @@ THe source code is provided in the sandbox. The building configuration has been 
 #### Show the input
 
 ```.term1
-cd $EXAMPLE_DIR && cat rose_bug_parallel_for.c 
+cd $EXAMPLE_DIR && cat bug_parallel_for_in_rose.c 
 ```
 
 #### Generate the incorrect output
@@ -61,13 +61,13 @@ cat rose_bug_parallel_for_in_rose.c
 ## C. Fix the Bug
 
 
-##### Fix the mismatched parameters
+#### Fix the mismatched parameters
 
 Modify the function declaration in the header file:
 ```.term1
 vim $ROSE_SRC/src/midend/programTransformation/ompLowering/libxomp.h
 ```
-On the line 72, the data type for ```lower```, ```upper```` and ```stride``` should be all changed from ```int``` to ```unsigned int```. Then use ```:wq``` to save and quit.
+On the line 72, the data type for ```lower```, ```upper``` and ```stride``` should be all changed from ```int``` to ```unsigned int```. Then use ```:wq``` to save and quit.
 
 Modify the function in the ```.c``` file:
 ```.term1
@@ -88,7 +88,7 @@ On the line 11602 and 11607, change the variable ```incr``` to ```arithOp```. Us
 
 First we need to rebuild ROSE to make modification effective.
 ```.term1
-cd $ROSE_BUILD && make core -j4 && make install-core
+cd $ROSE_BUILD && make core -j4 > /dev/null && make install-core > /dev/null
 ```
 
 #### Generate the output

@@ -68,12 +68,20 @@ Modify the function declaration in the header file:
 vim $ROSE_SRC/src/midend/programTransformation/ompLowering/libxomp.h
 ```
 On the line 72, the data type for ```lower```, ```upper```` and ```stride``` should be all changed from ```int``` to ```unsigned int```. Then use ```:wq``` to save and quit.
+```
+---72 extern void XOMP_loop_default(int lower, int upper, int stride, long* n_lower,long* n_upper);
++++72 extern void XOMP_loop_default(unsigned int lower, unsigned int upper, unsigned int stride, long* n_lower,long* n_upper);
+```
 
 Modify the function in the ```.c``` file:
 ```.term1
 vim $ROSE_SRC/src/midend/programTransformation/ompLowering/xomp.c
 ```
-On the line 574, the data type for ```lower```, ```upper```` and ```stride``` should be all changed from ```int``` to ```unsigned int```. Then use ```:wq``` to save and quit.
+On the line 574, the data type for ```lower```, ```upper``` and ```stride``` should be all changed from ```int``` to ```unsigned int```. Then use ```:wq``` to save and quit.
+```
+---574 extern void XOMP_loop_default(int lower, int upper, int stride, long* n_lower,long* n_upper)
++++574 extern void XOMP_loop_default(unsigned int lower, unsigned int upper, unsigned int stride, long* n_lower,long* n_upper)
+```
 
 
 #### Fix the miscalculated loop step
@@ -83,6 +91,14 @@ vim $ROSE_SRC/src/frontend/SageIII/sageInterface/sageInterface.C
 ```
 
 On the line 11602 and 11607, change the variable ```incr``` to ```arithOp```. Use ```:wq``` to save and quit.
+```
+---11602        stepast=isSgBinaryOp(incr)->get_rhs_operand();
++++11602        stepast=isSgBinaryOp(arithOp)->get_rhs_operand();
+...
+---11607          stepast=isSgBinaryOp(incr)->get_lhs_operand();
++++11607          stepast=isSgBinaryOp(arithOp)->get_lhs_operand();
+```
+
 
 #### Rebuild and test
 

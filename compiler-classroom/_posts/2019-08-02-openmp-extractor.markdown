@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "OpenMP Extractor - a plugin to extract OpenMP directives"
+title:  "OpenMP Extractor - a plugin to extract OpenMP directives."
 author: "@gleisonsdm"
 date:   2019-08-02
 categories: beginner
@@ -22,7 +22,7 @@ Concepts in this exercise:
 
 ## A. Overview
 
-This tool is an implementation of an external clang plugin. It can automatically parser the source code and extract OpenMP directives into Json files. For input the plugin use programs with existing OpenMP directives, the tool will parser them and extract relevant information about the code, providing facilities to check the correcntess of directives.
+This tool is an implementation of an external clang plugin. It can automatically parse the source code and extract OpenMP directives into Json files. For input the plugin use programs with existing OpenMP directives, the tool will parser them and extract relevant information about the code, providing facilities to check the correcntess of directives.
 
 
 ## B. Building OpenMP Extractor
@@ -47,7 +47,7 @@ cd /usr/src/OMP_Extractor/lib
 
 Create scripts to building.
 ```.term1
-CXX=g++-8 cmake -DLLVM_DIR=${LLVM_INSTALL}/lib/cmake/llvm /usr/src/OMP_Extractor/clangPlugin/
+CXX=g++ cmake -DLLVM_DIR=${LLVM_INSTALL}/lib/cmake/llvm /usr/src/OMP_Extractor/clangPlugin/
 ```
 
 Then the binaries of this library will be installed to ```/usr/src/OMP_Extractor/lib```.
@@ -90,9 +90,9 @@ Checkout if the Json file was created:
 ls 
 ```
 
-
 Checkout the output:
 ```.term1
-cat test.c
+cat test.c.json
 ```
+
 

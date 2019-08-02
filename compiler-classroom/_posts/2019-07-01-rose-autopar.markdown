@@ -9,36 +9,20 @@ tags: [rose,openmp,autopar,parallelization]
 
 This is a tool which can automatically insert OpenMP pragmas into input serial C/C++ codes.
 
-
 ---
 
 # A. Overview
 
-# B. Building autoPar
-
-# C. Usage Examples
-
----
-
-## A. Overview
-
 The goal of this tutorial is to learn how to use an automatic parallelizaiton tool, autoPar, built using ROSE. autoPar can automatically insert OpenMP directives into input serial C/C++ codes. For input programs with existing OpenMP directives, the tool can also double check the correctness when the right option is turned on.
 
-The source files are currently located in ```$ROSE_SRC/projects/autoParallelization```.
-A standalone executable program (named ```autoPar``` ) is generated and installed to the installation tree of ROSE (under ```$ROSE_PATH/bin```).
-Test input files are located at ```$ROSE_SRC/projects/autoParallelization/tests```.
-You can test the tool in ```$ROSE_BUILD/projects/autoParallelization``` by typing ```make check```.
-There is a section in ROSE manual: 12.7 Automatic Parallelization *pdf(http://rosecompiler.org/docs/snapshots/Edited%20ROSE-UserManual%209_10_231.pdf)*. 
-It is used to explore semantics-aware automatic parallelization, as described in our papers:
-
-A workshop paper: Chunhua Liao, Daniel J. Quinlan, Jeremiah J. Willcock and Thomas Panas, Extending Automatic Parallelization to Optimize High-Level Abstractions for Multicore, In Proceedings of the 5th international Workshop on OpenMP: Evolving OpenMP in An Age of Extreme Parallelism (Dresden, Germany, June 3–05, 2009). *pdf(https://e-reports-ext.llnl.gov/pdf/368494.pdf)*
-
-A journal version of the paper: Chunhua Liao, Daniel J. Quinlan, Jeremiah J. Willcock and Thomas Panas, Semantic-Aware Automatic Parallelization of Modern Applications Using High-Level Abstractions, Journal of Parallel Programming, Accepted in Jan. 2010 *pdf(https://e-reports-ext.llnl.gov/pdf/384220.pdf)*
+Directory layout
+* The source files are currently located in ```$ROSE_SRC/projects/autoParallelization```.
+* A standalone executable program (named ```autoPar``` ) is generated and installed to the installation tree of ROSE (under ```$ROSE_PATH/bin```).
+* Test input files are located at ```$ROSE_SRC/projects/autoParallelization/tests```.
 
 Similar to ROSE, autoPar is released under the BSD license.
 
-
-## B. Building autoPar
+# B. Building autoPar
 
 THe source code is provided in the sandbox. The building configuration has been completed as well. User could follow the steps below to build and try ```autoPar``` directly.
 
@@ -56,9 +40,9 @@ make install
 ```
 
 Then the binaries will be installed to ```$ROSE_PATH/bin```.
-The tool can be tested by the following code.
+The tool can be tested by the following command. This step is optional and it can take a while.
 ```.term1
-make check
+make check -j4
 ```
 
 Command line options:
@@ -72,7 +56,7 @@ Additional useful ROSE flags:
 --edg:no_warnings // suppress warnings from the EDG C++ frontend
 ```
 
-## C. Usage Examples
+# C. Usage Examples
 
 Testing input files can be found at https://github.com/rose-compiler/rose/tree/master/projects/autoParallelization/tests
 
@@ -80,7 +64,7 @@ The corresponding generated testing output files can be found at: https://github
 
 We provide two samples below:
 
-##### Without using annotations
+### Without using annotations
 
 Checkout the input:
 ```.term1
@@ -96,3 +80,9 @@ Checkout the output:
 ```.term1
 cat ./rose_inner_only.c
 ```
+
+# References
+
+For more information about this tool, please check
+* https://en.wikibooks.org/wiki/ROSE_Compiler_Framework/autoPar
+* There is a section in ROSE manual: 12.7 Automatic Parallelization *pdf(http://rosecompiler.org/docs/snapshots/Edited%20ROSE-UserManual%209_10_231.pdf)*. 

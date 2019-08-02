@@ -75,6 +75,17 @@ EOF
 ```
 
 Run OpenMP Extractor to run the plugin, you should load the library to run the analysis on clang.
+To send flags to clang, is necessary to use "-Xclang" before each argument.
+ - -load: Necessary to load libraries on clang.
+ - /usr/src/OMP_Extractor/lib/ompextractor/libCLANGOMPExtractor.so: This is the library containing the plugin.
+ - -add-plugin: Flag to add an out of tree plugin to clang.
+ - -extract-omp: This flag ask clang to run the plugin.
+ - -fopenmp: Provide objects in clang's frontend about OpenMP directives and clauses.
+ - -g: Flag to provide debug information about the source file.
+ - -O0: Disable optimizations from clang.
+ - -c: Flag to create an object file, then clang does not need to find the source code for included files.
+ - -fsyntax-only : Prevents the compiler to write an object file. We use this avoid the the creation of an intermediate file, as it is not necessary.
+ 
 ```.term1
 clang -Xclang -load -Xclang /usr/src/OMP_Extractor/lib/ompextractor/libCLANGOMPExtractor.so -Xclang -add-plugin -Xclang -extract-omp -fopenmp -g -O0 -c -fsyntax-only test.c
 ```

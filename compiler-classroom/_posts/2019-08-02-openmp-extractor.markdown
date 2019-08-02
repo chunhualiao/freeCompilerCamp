@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "OpenMP Extractor - a plugin to extract OpenMP directives."
+title:  "Extracting OpenMP Information from Programs using a Clang Plugin"
 author: "@gleisonsdm"
 date:   2019-08-02
 categories: beginner
@@ -59,25 +59,19 @@ make -j4
 
 We provide an example file to testing. Feel free to try other programs.
 ```.term1
-echo "#include <stdio.h>" &> test.c 
-echo "#include <stdlib.h>" &>> test.c
-echo "int main(int argc, char* argv[]) " &>> test.c
-echo "{ " &>> test.c  
-echo "  int i; " &>> test.c 
-echo "  int len = 1000; " &>> test.c 
-echo " " &>> test.c 
-echo "  int a[1000]; " &>> test.c 
-echo " " &>> test.c 
-echo "  #pragma omp parallel for " &>> test.c 
-echo "  for (i=0; i<len; i++) " &>> test.c 
-echo "    a[i]= i;  " &>> test.c 
-echo " " &>> test.c 
-echo "  for (i=0;i< len -1 ;i++) " &>> test.c 
-echo "    a[i]=a[i+1]+1; " &>> test.c 
-echo " " &>> test.c 
-echo '  printf ("a[500]=%d\n", a[500] ); ' &>> test.c 
-echo '  return 0; ' &>> test.c 
-echo "} " &>> test.c 
+cat << EOF > test.c
+int main (void)
+{
+  int sum=0;
+  #pragma omp parallel for reduction(+:sum)
+  for (int i = 0; i < 100; i++)
+  {
+    sum += 1;
+  }
+  printf ("sum = %d\n",sum);
+  return 0;
+}
+EOF
 ```
 
 Run OpenMP Extractor to run the plugin, you should load the library to run the analysis on clang.
@@ -95,4 +89,5 @@ Checkout the output:
 cat test.c.json
 ```
 
+In the end, the Json is a format to store OpenMP information extracted by Clang/LLVM.
 

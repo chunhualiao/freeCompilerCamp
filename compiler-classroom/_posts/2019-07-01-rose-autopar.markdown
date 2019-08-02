@@ -22,9 +22,9 @@ Directory layout
 
 Similar to ROSE, autoPar is released under the BSD license.
 
-# B. Building autoPar
+# B. Building and Installing autoPar
 
-THe source code is provided in the sandbox. The building configuration has been completed as well. User could follow the steps below to build and try ```autoPar``` directly.
+THe ROSE source code is provided in the sandbox. The building of librose has been completed as well. You now need to build and install autoPar by following the steps: 
 
 Enter ```autoPar``` build folder.
 ```.term1
@@ -45,7 +45,7 @@ The tool can be tested by the following command. This step is optional and it ca
 make check -j4
 ```
 
-Command line options:
+To display command line options:
 ```.term1
 autoPar --help
 ```
@@ -73,7 +73,7 @@ cat $ROSE_SRC/projects/autoParallelization/tests/inner_only.c
 
 Conduct auto parallelization:
 ```.term1
-autoPar -rose:C99 --edg:no_warnings -w -rose:verbose 0 --edg:restrict -rose:autopar:unique_indirect_index -rose:autopar:enable_patch -I$ROSE_SRC/src/frontend/SageIII -c $ROSE_SRC/projects/autoParallelization/tests/inner_only.c
+autoPar -c $ROSE_SRC/projects/autoParallelization/tests/inner_only.c
 ```
 
 Checkout the output:

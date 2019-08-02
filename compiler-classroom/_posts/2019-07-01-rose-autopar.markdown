@@ -12,7 +12,6 @@ This is a tool which can automatically insert OpenMP pragmas into input serial C
 
 ---
 
-Concepts in this exercise:
 # A. Overview
 
 # B. Building autoPar
@@ -23,18 +22,18 @@ Concepts in this exercise:
 
 ## A. Overview
 
-This tool is an implementation of automatic parallelization using OpenMP. It can automatically insert OpenMP directives into input serial C/C++ codes. For input programs with existing OpenMP directives, the tool will double check the correctness when the right option is turned on.
+The goal of this tutorial is to learn how to use an automatic parallelizaiton tool, autoPar, built using ROSE. autoPar can automatically insert OpenMP directives into input serial C/C++ codes. For input programs with existing OpenMP directives, the tool can also double check the correctness when the right option is turned on.
 
 The source files are currently located in ```$ROSE_SRC/projects/autoParallelization```.
 A standalone executable program (named ```autoPar``` ) is generated and installed to the installation tree of ROSE (under ```$ROSE_PATH/bin```).
 Test input files are located at ```$ROSE_SRC/projects/autoParallelization/tests```.
 You can test the tool in ```$ROSE_BUILD/projects/autoParallelization``` by typing ```make check```.
-There is a section in ROSE manual: 12.7 Automatic Parallelization pdf
+There is a section in ROSE manual: 12.7 Automatic Parallelization *pdf(http://rosecompiler.org/docs/snapshots/Edited%20ROSE-UserManual%209_10_231.pdf)*. 
 It is used to explore semantics-aware automatic parallelization, as described in our papers:
 
-A workshop paper: Chunhua Liao, Daniel J. Quinlan, Jeremiah J. Willcock and Thomas Panas, Extending Automatic Parallelization to Optimize High-Level Abstractions for Multicore, In Proceedings of the 5th international Workshop on OpenMP: Evolving OpenMP in An Age of Extreme Parallelism (Dresden, Germany, June 3–05, 2009). pdf
+A workshop paper: Chunhua Liao, Daniel J. Quinlan, Jeremiah J. Willcock and Thomas Panas, Extending Automatic Parallelization to Optimize High-Level Abstractions for Multicore, In Proceedings of the 5th international Workshop on OpenMP: Evolving OpenMP in An Age of Extreme Parallelism (Dresden, Germany, June 3–05, 2009). *pdf(https://e-reports-ext.llnl.gov/pdf/368494.pdf)*
 
-A journal version of the paper: Chunhua Liao, Daniel J. Quinlan, Jeremiah J. Willcock and Thomas Panas, Semantic-Aware Automatic Parallelization of Modern Applications Using High-Level Abstractions, Journal of Parallel Programming, Accepted in Jan. 2010 pdf
+A journal version of the paper: Chunhua Liao, Daniel J. Quinlan, Jeremiah J. Willcock and Thomas Panas, Semantic-Aware Automatic Parallelization of Modern Applications Using High-Level Abstractions, Journal of Parallel Programming, Accepted in Jan. 2010 *pdf(https://e-reports-ext.llnl.gov/pdf/384220.pdf)*
 
 Similar to ROSE, autoPar is released under the BSD license.
 

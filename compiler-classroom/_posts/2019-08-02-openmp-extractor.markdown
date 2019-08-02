@@ -115,21 +115,22 @@ First, let's open the plugin source file. The plugin was build in one for simpli
 vim /usr/src/OMP_Extractor/clangPlugin/ompextractor/ompextractor.cpp
 ```
 
-Then, modify the clauses to recognize the new directive. This tutorial will show us how to add suport to the num_threads OpenMP clause. To modify the file, please, go to the line 357 and insert the following code
+Then, modify the clauses to recognize the new directive. This tutorial will show us how to add suport to the ```num_threads``` OpenMP clause. To modify the file, please, go to the line 357 (or before the comment "/*Final or If clauses are marked as multiversioned.*/" in the function "ClassifyClause") and insert the following code:
 ```cpp
       /*NumThreads clause*/
       if (OMPNumThreadsClause *OMPCc = dyn_cast<OMPNumThreadsClause>(clause)) {
         clauseType["num_threads"] = getStrForStmt(OMPCc->getNumThreads());
       }
+
 ```
 
 
-The next step is to modify the Json builder to write the new feature (i.e. the clause). Please, go to the line 480 and insert the code as described below.
+The next step is to modify the Json builder to write the new feature (i.e. the clause). Please, go to the line 480 (or before line with ```currFile.labels += "\"body\":[" + snippet + "]\n";``` in the function "CreateLoopDirectiveNode") and insert the code as described below.
 ```cpp
 currFile.labels += "\"num threads\":\"" + ((clauseType.count("num_threads") > 0) ? (clauseType["num_threads"]) : "") + "\",\n";
 ```
 
-The last step before compile the modified code is to generate similar attribute for loops without openmp directives associated on it. To do that, please, go to the line 164 and insert the following code
+The last step before compile the modified code is to generate similar attribute for loops without openmp directives associated on it. To do that, please, go to the line 164 (or before line with ```currFile.labels += "\"body\":[" + snippet + "]\n";``` in the function "CreateLoopNode") and insert the following code:
 ```cpp
 currFile.labels += "\"num threads\":\"\",\n";
 ```  

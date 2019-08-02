@@ -34,7 +34,7 @@ https://github.com/chunhualiao/AutoParBench
 
 To download it:
 ```.term1
-git clone https://github.com/chunhualiao/AutoParBench.git /usr/src/OMP_Extractor
+git clone https://github.com/gleisonsdm/OpenMP-Extractor.git /usr/src/OMP_Extractor
 ```
 
 Create ```OMP_Extractor``` build folder.

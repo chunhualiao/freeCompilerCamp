@@ -67,7 +67,15 @@ cd $LLVM_BUILD && make -j8 install > /dev/null
 Once the code builds successfully and is installed, its time to test a small program. Let us create a new test file
 
 ```.term1
-cd $EXAMPLE_DIR && echo -e "int main(){\n#pragma omp metadirective\n  for(int i=0; i<100; i++);\n  return 0;\n}" > test_metadirective.c
+cd $EXAMPLE_DIR;
+cat <<EOF > test_metadirective.c
+int main() {
+#pragma omp metadirective
+      for(int i=0; i<100; i++);
+        return 0;
+            
+} 
+EOF
 ```
 
 Now you have a new test file `test_metadirective.c` which uses the `metadirective` directive. Build this file using your clang compiler.

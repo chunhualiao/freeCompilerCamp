@@ -1,2 +1,2 @@
 # freeCompilerCamp
-Goal: a website to automatically train and certify compiler researchers and developers
+Goal: an open, extensive online platform to automatically train and certify compiler researchers and developers.

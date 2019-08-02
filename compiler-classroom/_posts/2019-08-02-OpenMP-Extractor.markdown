@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "OpenMP Extractor - a plugin to extract OpenMP directives."
+title:  "OpenMP Extractor - a plugin to extract OpenMP directives"
 author: "@gleisonsdm"
 date:   2019-08-02
 categories: beginner

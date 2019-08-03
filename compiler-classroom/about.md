@@ -8,11 +8,6 @@ permalink: /about/
 
 This material is pulled from [https://github.com/chunhualiao/freeCompilerCamp](https://github.com/chunhualiao/freeCompilerCamp) and contains Compiler development labs and tutorials. We welcome contributions and want that repo to grow. If you have a tutorial to submit, or contributions to existing tutorials, please see this guide: [Guide to submitting your own tutorial](https://github.com/chunhualiao/freeCompilerCamp/wiki/Add-New-Tutorial)
 
-## About play-with-docker
-
-It gives you the experience of having a free Alpine Linux Virtual Machine in the cloud where you can build and run Docker containers and even create clusters with Docker features like Swarm Mode. Under the hood DIND or Docker-in-Docker is used to give the effect of multiple VMs/PCs.
-
-
 ## Acknowledgements
 
 This website is based on Play-with-docker (PWD), a site made by Docker captains [Marcos Nils](https://www.twitter.com/marcosnils) and [Jonathan Leibiusky](https://www.twitter.com/xetorthio). PWD is a Docker playground which allows you to try Docker and Swarm Mode in a matter of seconds. 

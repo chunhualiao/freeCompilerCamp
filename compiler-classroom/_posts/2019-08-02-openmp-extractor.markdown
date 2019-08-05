@@ -4,7 +4,7 @@ title:  "Extracting OpenMP Information from Programs using a Clang Plugin"
 author: "@gleisonsdm"
 date:   2019-08-02
 categories: beginner
-tags: [AutoParBench,openmp,framework,parallelization]
+tags: [openmp,plugin,clang]
 ---
 
 This is a clang plugin that can parse programs with OpenMP directives and generate Json files containing a description about loops.

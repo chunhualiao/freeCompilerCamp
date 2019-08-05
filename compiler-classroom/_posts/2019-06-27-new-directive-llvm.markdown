@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "How to add a new OpenMP directive in clang/llvm compiler"
+title:  "How to add a new OpenMP directive in Clang/LLVM compiler"
 author: "@alokmishra.besu"
 date:   2019-06-27
 categories: beginner
@@ -8,12 +8,12 @@ tags: [llvm,clang,openmp,directive]
 ---
 ### Features
 
-In this tutorial we will cover how to add a new OpenMP directive in clang/LLVM compiler. The goal of this tutorial is to add a new OpenMP directive -- metadirective (`#pragma omp metadirective [clause[[,]clause]...]`), defined in OpenMP Specification 5.0, that can specify multiple directive variants of which one may be conditionally selected to replace the metadirective based on the enclosing OpenMP context.
+In this tutorial we will cover how to add a new OpenMP directive in Clang/LLVM compiler. The goal of this tutorial is to add a new OpenMP directive -- metadirective (`#pragma omp metadirective [clause[[,]clause]...]`), defined in OpenMP Specification 5.0, that can specify multiple directive variants of which one may be conditionally selected to replace the metadirective based on the enclosing OpenMP context.
 
 ---
 
 ## Step 1 - Locate and go to clang directory
-First, let's enter the `LLVM` source folder to look around. There are a bunch of files and directories there. For now only interested in the clang sub-project of the LLVM source code. In this tutorials's environment, the clang project is located at `$LLVM_SRC/llvm-8.0.0.src/tools/cfe-8.0.0.src`. In your machine you should locate the clang project and switch to that directory.
+First, let's enter the `LLVM` source folder to look around. There are a bunch of files and directories there. For now only interested in the Clang sub-project of the LLVM source code. In this tutorials's environment, the Clang project is located at `$LLVM_SRC/llvm-8.0.0.src/tools/cfe-8.0.0.src`. In your machine you should locate the Clang project and switch to that directory.
 ```.term1
 cd $LLVM_SRC/llvm-8.0.0.src/tools/cfe-8.0.0.src
 ```
@@ -63,7 +63,7 @@ That's it for now. Now let us build and test our code.
 To build `LLVM` go to the `LLVM_BUILD` directory and run make. We are redirecting the output of make to /dev/null to have a clean output. It will still show errors.
 
 ```.term1
-cd $llvm_build && make -j8 install > /dev/null
+cd $LLVM_BUILD && make -j8 install > /dev/null
 ```
 
 you might get a couple of warnings about `enumeration value 'ompd_metadirective' not handled in switch`. ignore these warnings for now. we will handle them later. once the code builds successfully and is installed, its time to test a small program. let us create a new test file
@@ -80,7 +80,7 @@ int main() {
 eof
 ```
 
-now you have a new test file `test_metadirective.c` which uses the `metadirective` directive. build this file using your clang compiler.
+now you have a new test file `test_metadirective.c` which uses the `metadirective` directive. build this file using your Clang compiler.
 
 ```.term1
 clang -fopenmp test_metadirective.c
@@ -88,7 +88,7 @@ clang -fopenmp test_metadirective.c
 
 you should get an output `metadirective is caught`. 
 
-<span style="color:green">**congratulations**</span> you were successfully able to add a new directive to openmp in clang compiler.
+<span style="color:green">**Congratulations**</span> you were successfully able to add a new directive to openmp in Clang compiler.
 
 ## Step 5 - Identify Clause
 In the above implementation we just identified the `metadirective` token and did not factor in its clauses.
@@ -121,7 +121,7 @@ OPENMP_METADIRECTIVE_CLAUSE(when)
 
 Above we declared the `when` clause and the class associated with this clause. Next let us declare the class `OMPWhenClause`. We need to declare this in the `OpenMPClause.h` file, located in `include/clang/AST`.
 ```.term1
-vi include/clang/AST/OpenMPClause.h
+vim include/clang/AST/OpenMPClause.h
 ```
 This class should extend the class `OMPClause`, so we should make sure we define our class after the definition of `OMPClause`.
 ```
@@ -136,7 +136,7 @@ Note that we defined the default constructor to instantiate with `OMPC_when` tok
 
 Next we need to tell the compiler that this clause is an allowed clause for metadirective. For this we need to update the `clang::isAllowedClauseForDirective` function defined in `OpenMPKinds.cpp`, located in `lib/Basic`.
 ```.term1
-vi lib/Basic/OpenMPKinds.cpp
+vim lib/Basic/OpenMPKinds.cpp
 ```
 Here we locate the functiona `isAllowedClauseForDirective` and add the following code to the switch case (line 353)
 ```
@@ -206,7 +206,7 @@ These errors are caused due to the auto code generation which wants to visit the
 
 In the file `ASTReader.cpp`, located in `lib/Serialization`, goto `OMPClauseReader implementations` (line 11661)
 ```.term1
-vi lib/Serialization/ASTReader.cpp +11661
+vim lib/Serialization/ASTReader.cpp +11661
 ```
 and update the code as follows:
 ```
@@ -215,7 +215,7 @@ void OMPClauseReader::VisitOMPWhenClause(OMPWhenClause *C) {}
 
 In the file `ASTWriter.cpp`, located in `lib/Serialization`, goto `OMPClause Serialization` (line 6475)
 ```.term1
-vi lib/Serialization/ASTWriter.cpp +6475
+vim lib/Serialization/ASTWriter.cpp +6475
 ```
 and update the code as follows:
 ```
@@ -224,7 +224,7 @@ void OMPClauseWriter::VisitOMPWhenClause(OMPWhenClause *C) {}
 
 In the file `RecursiveASTVisitor.h`, located in `include/clang/AST`, goto after the definition of `RecursiveASTVisitor` (line 543)
 ```.term1
-vi include/clang/AST/RecursiveASTVisitor.h +543
+vim include/clang/AST/RecursiveASTVisitor.h +543
 ```
 and update the code as follows:
 ```
@@ -236,7 +236,7 @@ bool RecursiveASTVisitor<Derived>::VisitOMPWhenClause(OMPWhenClause *C) {
 
 In the file `TreeTransform.h`, located in `lib/Sema`, goto after the definition of `TreeTransform` (line 3272)
 ```.term1
-vi lib/Sema/TreeTransform.h +3272
+vim lib/Sema/TreeTransform.h +3272
 ```
 and update the code as follows:
 ```
@@ -248,7 +248,7 @@ OMPClause *TreeTransform<Derived>::TransformOMPWhenClause(OMPWhenClause *C) {
 
 In the file `OpenMPClause.cpp`, located in `lib/AST`, goto `OpenMP clauses printing method` (line 1062)
 ```.term1
-vi lib/AST/OpenMPClause.cpp +1062
+vim lib/AST/OpenMPClause.cpp +1062
 ```
 and update the code as follows:
 ```
@@ -260,7 +260,7 @@ void OMPClausePrinter::VisitOMPWhenClause(OMPWhenClause *Node) {
 
 In the file `StmtProfile.cpp`, located in `lib/AST`, goto after the definition of `OMPClauseProfiler` (line 421)
 ```.term1
-vi lib/AST/StmtProfile.cpp +421
+vim lib/AST/StmtProfile.cpp +421
 ```
 and update the code as follows:
 ```
@@ -270,7 +270,7 @@ void OMPClauseProfiler::VisitOMPWhenClause(const OMPWhenClause *C) {}
 
 In the file `CIndex.cpp`, located in `tools/libclang`, goto after the definition of `OMPClauseEnqueue` (line 2139)
 ```.term1
-vi tools/libclang/CIndex.cpp +2139
+vim tools/libclang/CIndex.cpp +2139
 ```
 and update the code as follows:
 ```
@@ -280,13 +280,13 @@ void OMPClauseEnqueue::VisitOMPWhenClause(const OMPWhenClause *C) {}
 This should resolve all the linking errors encountered before. Now rebuild the source code as before and test our code.
 
 ```.term1
-cd $llvm_build && make -j8 install > /dev/null
+cd $LLVM_BUILD && make -j8 install > /dev/null
 ```
 
-you might get a couple of warnings about `enumeration value 'OMPC_when' not handled in switch`. ignore these warnings for now. We will handle them later. once the code builds successfully and is installed, its time to test a small program. let us create a new test file
+You might get a couple of warnings about `enumeration value 'OMPC_when' not handled in switch`. ignore these warnings for now. We will handle them later. once the code builds successfully and is installed, its time to test a small program. let us create a new test file
 
 ```.term1
-cd $example_dir;
+cd $EXAMPLE_DIR;
 cat <<EOF > test_metadirective2.c
 int main() {
 #pragma omp metadirective when
@@ -297,13 +297,15 @@ int main() {
 EOF
 ```
 
-now you have a new test file `test_metadirective2.c` which uses the `metadirective` directive with clause `when`. Build this file using your clang compiler.
+Now you have a new test file `test_metadirective2.c` which uses the `metadirective` directive with clause `when`. Build this file using your Clang compiler.
 
 ```.term1
 clang -fopenmp test_metadirective2.c
 ```
 
-you should get an output `METADIRECTIVE is caught. WHEN clause is caught`. 
+you should get an output 
+`METADIRECTIVE is caught. 
+WHEN clause is caught`. 
 
-<span style="color:green">**Congratulations**</span> you were successfully able to add a clause to metadirective in openmp in clang compiler.
+<span style="color:green">**Congratulations**</span> you were successfully able to add a clause to metadirective in openmp in Clang compiler.
 

@@ -37,21 +37,47 @@ When ROSE transforms the ```parallel for``` directive, it outlines the pragma bo
 
 The variables in the ```private``` clause are not initialized, but it's not a bug. The initialization should be done by user but not by compiler.
 
-THe source code is provided in the sandbox. The building configuration has been completed as well. User could follow the steps below to build and try ```autoPar``` directly.
+THe source code is provided in the sandbox. The building configuration has been completed as well. User could follow the steps below to expose the bug and fix it directly.
 
 #### Show the input
 
 ```.term1
-cd $EXAMPLE_DIR && cat bug_parallel_for_in_rose.c 
+cd $EXAMPLE_DIR &&
+cat <<EOF > bug_parallel_for_in_rose.c
+#include <omp.h>
+#include <stdio.h>
+static long num_steps = 10000;
+int main()
+{
+    double x=0;
+    double sum = 0.0, pi;
+    unsigned i;
+    double  step = 1.0/(double) num_steps;
+    #pragma omp parallel for private(i,x) reduction(+:sum) schedule(static)
+    for (i=0; i<num_steps; i=i+1)
+    {
+        x=(i+0.5)*step;
+        sum = sum + 4.0/(1.0+x*x);
+    }
+    pi=step*sum;
+    printf("%f\n", pi);
+} 
+EOF
 ```
 
-#### Generate the incorrect output
+#### Generate the incorrect binary and generated source code
 
 ```.term1
-rose-compiler -rose:openmp:lowering -lomp -lxomp -lgomp bug_parallel_for_in_rose.c
+rose-compiler -rose:openmp:lowering -lxomp -lomp bug_parallel_for_in_rose.c
 ```
 
 #### Show the incorrect output
+
+```.term1
+./a.out
+```
+
+We can run the line above multiple times and could get different incorrect output but ```3.141593```. Let's see the generated source code.
 
 ```.term1
 cat rose_bug_parallel_for_in_rose.c 
@@ -109,10 +135,17 @@ cd $ROSE_BUILD && make core -j4 > /dev/null && make install-core > /dev/null
 
 #### Generate the output
 ```.term1
-cd $EXAMPLE_DIR && rose-compiler -rose:openmp:lowering -lomp -lxomp -lgomp bug_parallel_for_in_rose.c
+cd $EXAMPLE_DIR && rose-compiler -rose:openmp:lowering -lxomp -lomp bug_parallel_for_in_rose.c
 ```
 
 #### Show the correct output
+
+Run the binary and it shows ```3.141593```.
+```.term1
+./a.out
+```
+
+The generated source code also calculates the loop stride correctly.
 ```.term1
 cat rose_bug_parallel_for_in_rose.c 
 ```

@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "How to add a new OpenMP directive in Clang/LLVM compiler"
+title:  "How to add an AST Node to a new OpenMP directive in Clang/LLVM compiler"
 author: "@alokmishra.besu"
 date:   2019-06-27
 categories: beginner
@@ -8,7 +8,7 @@ tags: [llvm,clang,openmp,directive]
 ---
 ### Features
 
-In this tutorial we will cover how to add a new OpenMP directive in Clang/LLVM compiler. The goal of this tutorial is to add a new OpenMP directive -- metadirective (`#pragma omp metadirective [clause[[,]clause]...]`), defined in OpenMP Specification 5.0, that can specify multiple directive variants of which one may be conditionally selected to replace the metadirective based on the enclosing OpenMP context.
+In the previous tutorial we learnt how to identify or parse a new OpenMP directive in Clang/LLVM. In this tutorial we will cover how to add an AST Node to the new OpenMP directive in Clang/LLVM compiler. The goal of this tutorial is to add an AST Node to a new OpenMP directive -- metadirective (`#pragma omp metadirective [clause[[,]clause]...]`).
 
 ---
 
@@ -18,8 +18,10 @@ First, let's enter the `LLVM` source folder to look around. There are a bunch of
 cd $LLVM_SRC/llvm-8.0.0.src/tools/cfe-8.0.0.src
 ```
 
-## Step 2 - Adding New AST Node
+Complete all steps in tutorial on [How to add a new OpenMP directive in Clang/LLVM compiler](http://freecompilercamp.org/new-directive-llvm)
+Make sure all proper code is added in OpenMPKinds.def and ParseOpenMP.cpp from that turorial.
 
+## Step 2 - Adding New AST Node
 First step is to add a Statement Node, which are defined in the file `StmtNodes.td`. Clang reads this file and generates a StmtNodes.inc file, which is used to define different statement classes and read by several classes to define their node visitor function. We define an OMPMetaDirective node, which extends the OMPExecutableDirective class - a basic class for representing single OpenMP executable directive. We modify the file `StmtNodes.td` and go to the line after the definition of OMPExecutableDirective (line 206)
 ```.term1
 vim include/clang/Basic/StmtNodes.td +206
@@ -134,7 +136,7 @@ void StmtPrinter::VisitOMPMetaDirective(OMPMetaDirective *Node) {
 
 
 Similarly in `StmtProfile.cpp` we add the definition of VisitOMPMetaDirective after the definition of VisitOMPExecutableDirective.
-```.term
+```.term1
 vim lib/AST/StmtProfile.cpp +773
 ```
 VisitOMPMetaDirective simply calls the VisitOMPExecutableDirective function.
@@ -255,7 +257,7 @@ and add a case in the switch statement of getOpenMPCaptureRegions
 ```
 
 Going back to our parsing (ParseOpenMP.cpp), you can see that to create the Directive we used the function `ActOnOpenMPExecutableDirective`. This function (defined in the file `SemaOpenMP.cpp`), tells how to act on an OpenMP executable directive. We will modify this function to handle our case for metadirective. First we need to define how to act on OpenMP metadirective directive. We declare our function `ActOnOpenMPMetaDirective` in the header file `Sema.h` as part of the class Sema and provide its definition in `SemaOpenMP.cpp`. 
-```.term
+```.term1
 vim include/clang/Sema/Sema.h +8850
 ```
 The function ActOnOpenMPMetaDirective is called on well-formed '\#pragma omp metadirective' after parsing of the  associated statement.

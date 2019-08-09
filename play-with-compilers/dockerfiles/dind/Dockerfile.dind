@@ -29,15 +29,10 @@ RUN mkdir -p $LLVM_SRC && \
     mkdir -p $LLVM_PATH && \
 	mkdir -p $LLVM_BUILD && \
     cd $LLVM_SRC && \
-    wget http://releases.llvm.org/8.0.0/llvm-8.0.0.src.tar.xz && \
-    tar -xf llvm-8.0.0.src.tar.xz && \
-    cd llvm-8.0.0.src/tools && \
-    wget http://releases.llvm.org/8.0.0/cfe-8.0.0.src.tar.xz && \
-    tar -xf cfe-8.0.0.src.tar.xz && \
+    git clone https://github.com/chunhualiao/clang-llvm-tutorials.git . && \
     cd $LLVM_BUILD && \
-    cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH $LLVM_SRC/llvm-8.0.0.src && \
-    make -j4 && \
-    make install
+    cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH $LLVM_SRC && \
+    make -j8 install && \
 
 ENV PATH $LLVM_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $LLVM_PATH/libexec:$LD_LIBRARY_PATH

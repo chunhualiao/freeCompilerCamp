@@ -17,6 +17,7 @@ set backupdir=~
 set autochdir
 set spell
 set ruler
+set paste
 set cole=0
 if has("autocmd")
     au FileType html,css setlocal shiftwidth=2 tabstop=2

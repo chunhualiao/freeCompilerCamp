@@ -137,7 +137,7 @@ void StmtPrinter::VisitOMPMetaDirective(OMPMetaDirective *Node) {
 
 Similarly in `StmtProfile.cpp` we add the definition of VisitOMPMetaDirective after the definition of VisitOMPExecutableDirective.
 ```.term1
-vim lib/AST/StmtProfile.cpp +773
+vim lib/AST/StmtProfile.cpp +769
 ```
 VisitOMPMetaDirective simply calls the VisitOMPExecutableDirective function.
 ```

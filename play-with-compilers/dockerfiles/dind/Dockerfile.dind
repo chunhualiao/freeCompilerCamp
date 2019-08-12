@@ -27,12 +27,12 @@ ENV LLVM_BUILD /opt/build/llvm_build
 
 RUN mkdir -p $LLVM_SRC && \
     mkdir -p $LLVM_PATH && \
-	mkdir -p $LLVM_BUILD && \
+    mkdir -p $LLVM_BUILD && \
     cd $LLVM_SRC && \
     git clone https://github.com/chunhualiao/clang-llvm-tutorials.git . && \
     cd $LLVM_BUILD && \
     cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH $LLVM_SRC && \
-    make -j8 install && \
+    make -j8 install
 
 ENV PATH $LLVM_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $LLVM_PATH/libexec:$LD_LIBRARY_PATH
@@ -54,6 +54,8 @@ RUN apt-get install -y \
         python-software-properties \
         software-properties-common
 # Install Java JDK
+RUN add-apt-repository ppa:openjdk-r/ppa
+RUN apt-get update
 RUN apt-get install -y openjdk-8-jdk
 # Install dependency
 RUN apt-get install -y \

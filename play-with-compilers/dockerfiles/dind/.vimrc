@@ -15,7 +15,7 @@ set wrapscan
 set dir=~
 set backupdir=~
 set autochdir
-set spell
+set nospell
 set ruler
 set paste
 set cole=0

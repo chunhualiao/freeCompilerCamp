@@ -27,7 +27,13 @@ The bug is mentioned in the issue 35 in official ROSE repository on GitHub (http
 
 When ROSE transforms the ```parallel for``` directive, it outlines the pragma body and make multiple calls to this outlined function for different portion of the ```for``` loop. The beginning, ending index and step of ```for``` loop has to be calculated carefully to enforce correct result.
 
+Plese execute the following code to prepare solutions for this tutorial and retrive them later.
 
+```.term1
+cd $ROSE_SRC &&
+git remote add sol https://github.com/ouankou/rose.git &&
+git fetch sol
+```
 
 ## B. Existing Bug
 
@@ -99,6 +105,14 @@ On the line 72, the data type for ```lower```, ```upper``` and ```stride``` shou
 +++72 extern void XOMP_loop_default(unsigned int lower, unsigned int upper, unsigned int stride, long* n_lower,long* n_upper);
 ```
 
+Get solution for this step and your changes will be discarded if the solution is applied:
+
+```.term1
+cd $ROSE_SRC &&
+git checkout sol/fix_issue35 $ROSE_SRC/src/midend/programTransformation/ompLowering/libxomp.h &&
+cd -
+```
+
 Modify the function in the ```.c``` file:
 ```.term1
 vim $ROSE_SRC/src/midend/programTransformation/ompLowering/xomp.c
@@ -107,6 +121,14 @@ On the line 574, the data type for ```lower```, ```upper``` and ```stride``` sho
 ```
 ---574 extern void XOMP_loop_default(int lower, int upper, int stride, long* n_lower,long* n_upper)
 +++574 extern void XOMP_loop_default(unsigned int lower, unsigned int upper, unsigned int stride, long* n_lower,long* n_upper)
+```
+
+Get solution for this step and your changes will be discarded if the solution is applied:
+
+```.term1
+cd $ROSE_SRC &&
+git checkout sol/fix_issue35 $ROSE_SRC/src/midend/programTransformation/ompLowering/xomp.c &&
+cd -
 ```
 
 
@@ -123,6 +145,14 @@ On the line 11602 and 11607, change the variable ```incr``` to ```arithOp```. Us
 ...
 ---11607          stepast=isSgBinaryOp(incr)->get_lhs_operand();
 +++11607          stepast=isSgBinaryOp(arithOp)->get_lhs_operand();
+```
+
+Get solution for this step and your changes will be discarded if the solution is applied:
+
+```.term1
+cd $ROSE_SRC &&
+git checkout sol/fix_issue35 $ROSE_SRC/src/frontend/SageIII/sageInterface/sageInterface.C &&
+cd -
 ```
 
 

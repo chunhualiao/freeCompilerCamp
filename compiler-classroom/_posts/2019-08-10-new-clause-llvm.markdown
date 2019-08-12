@@ -12,11 +12,15 @@ In this tutorial we will cover how to add a clause to a new OpenMP directive in 
 
 ---
 
-## Step 1 - Locate and go to clang directory
-First, let's enter the `LLVM` source folder to look around. There are a bunch of files and directories there. For now only interested in the Clang sub-project of the LLVM source code. In this tutorials's environment, the Clang project is located at `$LLVM_SRC/llvm-8.0.0.src/tools/cfe-8.0.0.src`. In your machine you should locate the Clang project and switch to that directory.
+## Step 1 - Get previous tutorial's files
+First we should get the files that we updated in the previous tutorial. In your local system you may use your own updated files. Or you can checkout the updated code from our `meta-ast` branch.
 ```.term1
-cd $LLVM_SRC/llvm-8.0.0.src/tools/cfe-8.0.0.src
+cd $LLVM_SRC/tools/clang
+git checkout meta-ast
 ```
+
+You may check that all proper code is added from the previous turorial.
+
 
 ## Step 2 - Identify Clause
 In the previous tutorial we just identified the `metadirective` token and create its AST node, but did not factor in its clauses.
@@ -211,24 +215,27 @@ This should resolve all the linking errors encountered before. Now rebuild the s
 cd $LLVM_BUILD && make -j8 install > /dev/null
 ```
 
-You might get a couple of warnings about `enumeration value 'OMPC_when' not handled in switch`. ignore these warnings for now. We will handle them later. once the code builds successfully and is installed, its time to test a small program. let us create a new test file
+You might get a couple of warnings about `enumeration value 'OMPC_when' not handled in switch`. Ignore these warnings for now. We will handle them later. Once the code builds successfully and is installed, its time to test a small program. Let us get a new test file
 
 ```.term1
-cd $EXAMPLE_DIR;
-cat <<EOF > test_metadirective2.c
-int main() {
-#pragma omp metadirective when
-      for(int i=0; i<100; i++);
-        return 0;
-            
-} 
-EOF
+wget https://raw.githubusercontent.com/chunhualiao/freecc-examples/master/metadirective/meta_when.c
 ```
 
-Now you have a new test file `test_metadirective2.c` which uses the `metadirective` directive with clause `when`. Build this file using your Clang compiler.
+Now you have a new test file `meta_when.c` which uses the `metadirective` directive with clause `when`. The content of this file must be as follows:
+```
+int main()
+{
+#pragma omp metadirective when
+    for(int i=0; i<10; i++)
+    ;
+    return 0;
+}
+```
+
+Build this file using your Clang compiler.
 
 ```.term1
-clang -fopenmp test_metadirective2.c
+clang -fopenmp meta_when.c
 ```
 
 you should get an output 

@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "How to add an AST Node to a new OpenMP directive in Clang/LLVM compiler"
+title:  "How to add an AST Node for a new OpenMP directive in Clang/LLVM compiler"
 author: "@alokmishra.besu"
 date:   2019-06-27
 categories: beginner
@@ -8,18 +8,18 @@ tags: [llvm,clang,openmp,directive]
 ---
 ### Features
 
-In the previous tutorial we learnt how to identify or parse a new OpenMP directive in Clang/LLVM. In this tutorial we will cover how to add an AST Node to the new OpenMP directive in Clang/LLVM compiler. The goal of this tutorial is to add an AST Node to a new OpenMP directive -- metadirective (`#pragma omp metadirective [clause[[,]clause]...]`).
+In the [previous tutorial](http://freecompilercamp.org/new-directive-llvm) we learnt how to identify or parse a new OpenMP directive in Clang/LLVM. In this tutorial we will cover how to add an AST Node for the new OpenMP directive in Clang/LLVM compiler. The goal of this tutorial is to add an AST Node for a new OpenMP directive -- metadirective (`#pragma omp metadirective [clause[[,]clause]...]`).
 
 ---
 
-## Step 1 - Locate and go to clang directory
-First, let's enter the `LLVM` source folder to look around. There are a bunch of files and directories there. For now only interested in the Clang sub-project of the LLVM source code. In this tutorials's environment, the Clang project is located at `$LLVM_SRC/llvm-8.0.0.src/tools/cfe-8.0.0.src`. In your machine you should locate the Clang project and switch to that directory.
+## Step 1 - Get previous tutorial's files
+First we should get the files that we updated in the previous tutorial. In your local system you may use your own updated files. Or you can checkout the updated code from our `meta` branch.
 ```.term1
-cd $LLVM_SRC/llvm-8.0.0.src/tools/cfe-8.0.0.src
+cd $LLVM_SRC/tools/clang
+git checkout meta
 ```
 
-Complete all steps in tutorial on [How to add a new OpenMP directive in Clang/LLVM compiler](http://freecompilercamp.org/new-directive-llvm)
-Make sure all proper code is added in OpenMPKinds.def and ParseOpenMP.cpp from that turorial.
+You may check that all proper code is added in OpenMPKinds.def and ParseOpenMP.cpp from the previous turorial.
 
 ## Step 2 - Adding New AST Node
 First step is to add a Statement Node, which are defined in the file `StmtNodes.td`. Clang reads this file and generates a StmtNodes.inc file, which is used to define different statement classes and read by several classes to define their node visitor function. We define an OMPMetaDirective node, which extends the OMPExecutableDirective class - a basic class for representing single OpenMP executable directive. We modify the file `StmtNodes.td` and go to the line after the definition of OMPExecutableDirective (line 206)
@@ -111,7 +111,7 @@ ASTReaderStmt.cpp - Implements Statements and Expression deserialization.  This 
 ASTWriterStmt.cpp - Implements serialization for Statements and Expressions.
 
 
-In `RecursiveASTVisitor.h` file a macro is defined for Stmts to automate iterating over the children defined in children() (every stmt defines these, though sometimes the range is empty).  Each individual Traverse* method only needs to worry about children other than those.
+In `RecursiveASTVisitor.h` file a macro is defined for Stmts to automate iterating over the children defined in children() (every stmt defines these, though sometimes the range is empty).  Each individual Traverse method only needs to worry about children other than those.
 
 To define our own traverse method for metadirective, we will use this macro. We wil add our traverse method after the definition of the macro `DEF_TRAVERSE_STMT` (ends at line 2118).
 ```.term1
@@ -310,27 +310,30 @@ To build `LLVM` go to the `LLVM_BUILD` directory and run make. We are redirectin
 cd $LLVM_BUILD && make -j8 install > /dev/null
 ```
 
-You might get a couple of warnings about `enumeration value 'ompd_metadirective' not handled in switch`. ignore these warnings for now. we will handle them later. once the code builds successfully and is installed, its time to test a small program. let us create a new test file
+You might get a couple of warnings about `enumeration value 'OMPD_metadirective' not handled in switch`. Ignore these warnings for now. we will handle them later. Once the code builds successfully and is installed, its time to test a small program. let us get a new test file
 
 ```.term1
-cd $example_dir;
-cat <<eof > test_metadirective.c
-int main() {
+wget https://raw.githubusercontent.com/chunhualiao/freecc-examples/master/metadirective/meta.c
+```
+
+Now you have a new test file `meta.c` which uses the `metadirective` directive. The content of the file should be as follows:
+```
+int main()
+{
 #pragma omp metadirective
-      for(int i=0; i<100; i++);
-        return 0;
-            
-} 
-eof
+    for(int i=0; i<10; i++)
+    ;
+    return 0;
+}
 ```
 
-Now you have a new test file `test_metadirective.c` which uses the `metadirective` directive. build this file using your Clang compiler.
+Build this file using your Clang compiler.
 
 ```.term1
-clang -fopenmp -Xclang -ast-dump test_metadirective.c
+clang -fopenmp -Xclang -ast-dump meta.c
 ```
 
-you should get an AST tree with OMPMetaDirective Node.
+you should get an AST tree with OMPMetaDirective Node in it.
 
-<span style="color:green">**Congratulations**</span> you were successfully able to add an AST Node to a new directive to openmp in Clang compiler.
+<span style="color:green">**Congratulations**</span> you were successfully able to add an AST Node for a new directive to openmp in Clang compiler.
 

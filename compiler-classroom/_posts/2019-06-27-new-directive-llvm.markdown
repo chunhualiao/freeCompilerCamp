@@ -13,9 +13,9 @@ In this tutorial we will cover how to add a new OpenMP directive in Clang/LLVM c
 ---
 
 ## Step 1 - Locate and go to clang directory
-First, let's enter the `LLVM` source folder to look around. There are a bunch of files and directories there. For now only interested in the Clang sub-project of the LLVM source code. In this tutorials's environment, the Clang project is located at `$LLVM_SRC/llvm-8.0.0.src/tools/cfe-8.0.0.src`. In your machine you should locate the Clang project and switch to that directory.
+First, let's enter the `LLVM` source folder to look around. There are a bunch of files and directories there. For now only interested in the Clang sub-project of the LLVM source code. In this tutorials's environment, the Clang project is located at `$LLVM_SRC/tools/clang`. In your machine you should locate the Clang project and switch to that directory.
 ```.term1
-cd $LLVM_SRC/llvm-8.0.0.src/tools/cfe-8.0.0.src
+cd $LLVM_SRC/tools/clang
 ```
 
 ## Step 2 - Define the new directive
@@ -49,13 +49,12 @@ Now in this file go to the function `ParseOpenMPDeclarativeOrExecutableDirective
 ```
   switch (DKind) {
   case OMPD_metadirective: {
-    std::cout <<"METADIRECTIVE is caught\n";
+    llvm::errs() <<"METADIRECTIVE is caught\n";
     ConsumeToken();
     ConsumeAnnotationToken();
     break;
   }
 ```
-To support the std::cout include `iostream` at the start of the file.
 
 That's it for now. Now let us build and test our code.
 
@@ -66,26 +65,29 @@ To build `LLVM` go to the `LLVM_BUILD` directory and run make. We are redirectin
 cd $LLVM_BUILD && make -j8 install > /dev/null
 ```
 
-you might get a couple of warnings about `enumeration value 'ompd_metadirective' not handled in switch`. ignore these warnings for now. we will handle them later. once the code builds successfully and is installed, its time to test a small program. let us create a new test file
+You might get a couple of warnings about `enumeration value 'ompd_metadirective' not handled in switch`. ignore these warnings for now. we will handle them later. Once the code builds successfully and is installed, its time to test a small program. let us get a new test file
 
 ```.term1
-cd $example_dir;
-cat <<eof > test_metadirective.c
-int main() {
-#pragma omp metadirective
-      for(int i=0; i<100; i++);
-        return 0;
-            
-} 
-eof
+wget https://raw.githubusercontent.com/chunhualiao/freecc-examples/master/metadirective/meta.c
 ```
 
-now you have a new test file `test_metadirective.c` which uses the `metadirective` directive. build this file using your Clang compiler.
+now you have a new test file `meta.c` which uses the `metadirective` directive. The content of the file should be as follows:
+```
+int main()
+{
+#pragma omp metadirective 
+    for(int i=0; i<10; i++)
+    ;
+    return 0;
+}
+```
+
+Build this file using your Clang compiler.
 
 ```.term1
-clang -fopenmp test_metadirective.c
+clang -fopenmp meta.c
 ```
 
 you should get an output `metadirective is caught`. 
 
-<span style="color:green">**Congratulations**</span> you were successfully able to add a new directive to openmp in Clang compiler.
+<span style="color:green">**Congratulations**</span> you were successfully able to add and identify a new directive to openmp in Clang compiler.

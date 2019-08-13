@@ -20,12 +20,12 @@ Getting familiar with AST is the first step to develop program analysis and tran
 # B. Build/Install AST Tools
 Build the pdf generator
 ```.term1
-make -C $$ROSE_BUILD/exampleTranslators/PDFGenerator install
+make -C $ROSE_BUILD/exampleTranslators/PDFGenerator install
 ```
 
 Build and install the dot graph generators
 ```.term1
-make -C $$ROSE_BUILD/exampleTranslators/DOTGenerator install
+make -C $ROSE_BUILD/exampleTranslators/DOTGenerator install
 ```
 
 # C. Obtain Example Input Codes

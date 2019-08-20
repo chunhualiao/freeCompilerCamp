@@ -30,7 +30,7 @@ To define the new directive we will modify the file `OpenMPKinds.def`, located i
 vim include/clang/Basic/OpenMPKinds.def
 ```
 
-Now in this file go towards the end (to line 891 or before `#undef OPENMP_DIRECTIVE_EXT` is called) and add the following line
+Now in this file go to line 237 (or anywhere before `#undef OPENMP_DIRECTIVE_EXT` is called) and add the following new line after it:
 ```
 OPENMP_DIRECTIVE_EXT(metadirective, "metadirective")
 ```

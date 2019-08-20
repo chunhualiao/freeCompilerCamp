@@ -239,15 +239,18 @@ make install
 ```
 
 ## C. Compiling code with offloading support
+Note: The terminal on the right side does not have cuda installed. So you cannot really compile, link and run the OpenMP code with offloading support in the terminal. The instructions below are used to guide you to try it on a machine with cuda installed. 
+
 To compile a code with OpenMP GPU offloading support we must provide some compile time parameters to clang. Most common parameters are:
 ```
 clang -fopenmp -fopenmp-targets=nvptx64-nvidia-cuda --cuda-path=<CUDA_INSTALL_PATH> -Xopenmp-target -march=sm_XX <file>
 ```
 Here, 
--fopenmp instructs clang that it need to compile an OpenMP code.
--fopenmp-targets instructs clang to use nvptx64-nvidia-cuda as the target device.
---cuda-path suggests the location where cuda is installed.
--Xopenmp-target -march set the target architecture. For instance, while building for P100 we should use -Xopenmp-target -march=sm_60, while for V100 we should use -Xopenmp-target -march=sm_70
+
+* -fopenmp instructs clang that it need to compile an OpenMP code.
+* -fopenmp-targets instructs clang to use nvptx64-nvidia-cuda as the target device.
+* --cuda-path suggests the location where cuda is installed.  
+* -Xopenmp-target -march set the target architecture. For instance, while building for P100 we should use -Xopenmp-target -march=sm_60, while for V100 we should use -Xopenmp-target -march=sm_70
 
 Before using clang to build OpenMP code for GPU offloading, we should always check if the compatible runtime is present or not. For instance, if we need to build for compute capability 3.5 we should check whether the library libomptarget-nvptx-sm_35.bc is present in the directory  $LLVM_PATH/lib. If not, then we should rebuild OpenMP with support for that compute capability.
 

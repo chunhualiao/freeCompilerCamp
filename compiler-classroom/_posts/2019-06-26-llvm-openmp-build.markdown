@@ -17,10 +17,9 @@ Concepts in this exercise:
 ##### 1. Prerequisite softwares:
 ##### 2. Setup the following environment variables in our system
 ##### 3. Download LLVM and Clang
-##### 4. Build with make
-##### 5. Detailed Explanation
-##### 6. Build with Ninja
-##### 7. Setting Environment Variables
+##### 4.1 Build with make
+##### 4.2 Build with Ninja (Optional)
+##### 5. Setting Environment Variables
 
 # B. Building OpenMP with CMake
 ##### 1. Prerequisite
@@ -102,7 +101,7 @@ Return back to LLVM_SRC path
 ```.term1
 cd $LLVM_SRC
 ```
-### A.4 Build with make
+### A.4.1 Build with make
 Create a build directory and get into it
 ```.term1
 mkdir build && cd build
@@ -131,7 +130,8 @@ make install installs all the built llvm/clang files to the LLVM_PATH location.
 ```.term1
 make install
 ```
-### A.5 Build with Ninja (Optional)
+
+### A.4.2 Build with Ninja (Optional)
 **[Ninja](https://ninja-build.org)** is much faster than make. Where other build systems are high-level languages Ninja aims to be an assembler. Ninja build files are human-readable but not especially convenient to write by hand. These constrained build files allow Ninja to evaluate incremental builds quickly.
 
 To build ninja supported files, we use the option -G Ninja
@@ -151,7 +151,7 @@ ninja install installs all the built llvm/clang files to the LLVM_PATH location.
 ninja install
 ```
 
-### A.6 Setting Environment Variables
+### A.5 Setting Environment Variables
 Following environment variables need to be set before using llvm/clang
 ```.term1
 export PATH=$LLVM_PATH:$PATH

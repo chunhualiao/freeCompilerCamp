@@ -120,7 +120,7 @@ For boosting performance sometimes we can use the /dev/shm as our temporary dire
 ```.term1
 export TMPDIR=/dev/shm 
 ```
-Once the required build files are created, we can start building using make. We can create as many threads as the number of processors. For instance, suppose your system has 4 cores on a node. So on this system we can run this command as make -j4. This will speedup the build process. ```WARNING``` - the make command will take a couple of hours to complete
+Once the required build files are created, we can start building using make. We can create as many threads as the number of processors. For instance, suppose your system has 4 cores on a node. So on this system we can run this command as make -j4. This will speedup the build process. ```WARNING``` - the make command will take a couple of hours to complete.
 
 ```.term1
 make -j4

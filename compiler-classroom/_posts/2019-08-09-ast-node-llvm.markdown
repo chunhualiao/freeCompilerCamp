@@ -164,10 +164,10 @@ vim lib/Serialization/ASTReaderStmt.cpp
 ```
 We modify the function `ReadStmtFromStream` to read our statement. We go to the end of the switch case (line 3397) and add our own case where we create an empty OMPMetaDirective statement.
 ```
-case STMT_OMP_META_DIRECTIVE:
+    case STMT_OMP_META_DIRECTIVE:
       S = OMPMetaDirective::CreateEmpty(Context,
-                                          Record[ASTStmtReader::NumStmtFields],
-                                          Empty);
+                                        Record[ASTStmtReader::NumStmtFields],
+                                        Empty);
       break;
 ```
 
@@ -223,7 +223,7 @@ vim lib/Parse/ParseOpenMP.cpp +998
 In the last tutorial, we simply consumed the token and break out of the switch case. Now we will instantiate the scope of the directive, get the associated statement and create the Directive.
 ```
   case OMPD_metadirective: {
-    std::cout <<"METADIRECTIVE is caught\n";
+    llvm::errs() <<"METADIRECTIVE is caught\n";
     ConsumeToken();
     ParseScope OMPDirectiveScope(this, ScopeFlags);
     Actions.StartOpenMPDSABlock(DKind, DirName, Actions.getCurScope(), Loc);
@@ -263,9 +263,9 @@ vim include/clang/Sema/Sema.h +8850
 The function ActOnOpenMPMetaDirective is called on well-formed '\#pragma omp metadirective' after parsing of the  associated statement.
 ```
   StmtResult ActOnOpenMPMetaDirective(ArrayRef<OMPClause *> Clauses,
-                                          Stmt *AStmt,
-                                          SourceLocation StartLoc,
-                                          SourceLocation EndLoc);
+                                      Stmt *AStmt,
+                                      SourceLocation StartLoc,
+                                      SourceLocation EndLoc);
 ```
 Now let us define the function. For that we open the SemaOpenMP.cpp file
 ```.term1
@@ -274,26 +274,26 @@ vim lib/Sema/SemaOpenMP.cpp +3681
 In this function we create the OMPMetaDirective.
 ```
 StmtResult Sema::ActOnOpenMPMetaDirective(ArrayRef<OMPClause *> Clauses,
-                                               Stmt *AStmt,
-                                               SourceLocation StartLoc,
-                                               SourceLocation EndLoc) {
-   if (!AStmt)
-     return StmtError();
+                                          Stmt *AStmt,
+                                          SourceLocation StartLoc,
+                                          SourceLocation EndLoc) {
+  if (!AStmt)
+    return StmtError();
  
-   auto *CS = cast<CapturedStmt>(AStmt);
-   CS->getCapturedDecl()->setNothrow();
+  auto *CS = cast<CapturedStmt>(AStmt);
+  CS->getCapturedDecl()->setNothrow();
  
-   setFunctionHasBranchProtectedScope();
- 
-   return OMPMetaDirective::Create(Context, StartLoc, EndLoc, Clauses, AStmt,
-                                       DSAStack->isCancelRegion());
- }
+  setFunctionHasBranchProtectedScope();
+
+  return OMPMetaDirective::Create(Context, StartLoc, EndLoc, Clauses, AStmt,
+                                  DSAStack->isCancelRegion());
+}
 ```
 Now it is time to call our function from ActOnOpenMPExecutableDirective. Let us go to the switch case in the function ActOnOpenMPExecutableDirective (line 3420). We add our case OMPD_metadirective where we call the ActOnOpenMPMetaDirective function.
 ```
-   case OMPD_metadirective:
-     Res = ActOnOpenMPMetaDirective(ClausesWithImplicit, AStmt, StartLoc, EndLoc);
-     break;
+  case OMPD_metadirective:
+    Res = ActOnOpenMPMetaDirective(ClausesWithImplicit, AStmt, StartLoc, EndLoc);
+    break;
 ``` 
 We also need to initialize the captured region. For this we add our case in the function ActOnOpenMPRegionStart (line 2483). We will be using the code used to initialize region capture for other directives like parallel or teams,etc.
 ```

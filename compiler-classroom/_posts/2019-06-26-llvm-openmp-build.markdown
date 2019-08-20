@@ -50,7 +50,7 @@ docker container start <container ID>
 LLVM is already built and installed ($LLVM_PATH) in this environment. The LLVM source code can be found on $LLVM_SRC. A normal LLVM build might take a couple of hours to complete. The next section (section A) is for people who want to learn about how to install LLVM. If you  are just interested in building OpenMP in LLVM please go to [Section B](#openmp). 
 
 ## A. Building llvm-8.0.0 with CMake
-**[CMake](http://www.cmake.org/)**  is a cross-platform build-generator tool. CMake does not build the project, it generates the files needed by our build tool *(GNU make, ninja, etc.)* for building LLVM.
+**[CMake](http://www.cmake.org/)**  is a cross-platform build-generator tool. CMake does not directly build the project, it generates the files needed by our build system *(GNU make, ninja, etc.)* for building LLVM.
  
 We can either download the tar files from **[LLVM Download page](http://releases.llvm.org/download.html)** or we can checkout from their git repo. Here I will be using the download page, but git works in similar way.
 
@@ -59,10 +59,18 @@ We can either download the tar files from **[LLVM Download page](http://releases
 2. Gcc (version 5 and above. Keep below version 7 for OpenMP)
 3. Python (version 2.7 and above)
 
-### A.2 Setup the following environment variables in our system
+All three software packages have been installed in the terminal on the right side. We just need to confirm this:
 ```
-$ export LLVM_SRC=<Path where LLVM source resides>
-$ export LLVM_PATH=<Path where LLVM need to be installed>
+$ which gcc
+$ which cmake
+$ which python
+```
+
+### A.2 Setup the following environment variables in our system
+The follow environment variables have already been set in the terminal on the right side. We just need to confirm this: 
+```
+$ echo $LLVM_SRC
+$ echo LLVM_PATH=<Path where LLVM need to be installed>
 ```
 
 ### A.3 Download LLVM and Clang

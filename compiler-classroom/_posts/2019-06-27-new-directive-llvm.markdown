@@ -6,6 +6,22 @@ date:   2019-06-27
 categories: beginner
 tags: [llvm,clang,openmp,directive]
 ---
+
+# Tips:
+
+Code snippets are shown in one of three ways throughout this environment:
+
+1. Code that looks like `this` is sample code snippets that is usually part of an explanation.
+2. Code that appears in box like the one below can be clicked on and it will automatically be typed in to the appropriate terminal window:
+```.term1
+vim readme.txt
+```
+
+3. Code appearing in windows like the one below is code that you should type in yourself. Usually there will be a unique ID or other bit your need to enter which we cannot supply. Items appearing in <> are the pieces you should substitute based on the instructions.
+```
+Add your name here - <name>
+```
+
 ### Features
 
 In this tutorial we will cover how to add a new OpenMP directive in Clang/LLVM compiler. The goal of this tutorial is to add a new OpenMP directive -- metadirective (`#pragma omp metadirective [clause[[,]clause]...]`), defined in OpenMP Specification 5.0, that can specify multiple directive variants of which one may be conditionally selected to replace the metadirective based on the enclosing OpenMP context.

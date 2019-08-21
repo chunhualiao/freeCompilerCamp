@@ -12,7 +12,22 @@ Llvm-8.0.0 now has GPU offloading support in their OpenMP implementation. But bu
 
 ---
 
-Concepts in this exercise:
+# Tips:
+
+Code snippets are shown in one of three ways throughout this environment:
+
+1. Code that looks like `this` is sample code snippets that is usually part of an explanation.
+2. Code that appears in box like the one below can be clicked on and it will automatically be typed in to the appropriate terminal window:
+```.term1
+vim readme.txt
+```
+
+3. Code appearing in windows like the one below is code that you should type in yourself. Usually there will be a unique ID or other bit your need to enter which we cannot supply. Items appearing in <> are the pieces you should substitute based on the instructions.
+```
+Add your name here - <name>
+```
+
+**Concepts in this exercise:**
 # A. Building llvm-8.0.0 with CMake
 ##### 1. Prerequisite softwares:
 ##### 2. Setup the following environment variables in our system
@@ -30,21 +45,6 @@ Concepts in this exercise:
 # C. Compiling code with offloading support
 
 ---
-
-# Tips:
-
-Code snippets are shown in one of three ways throughout this environment:
-
-1. Code that looks like `this` is sample code snippets that is usually part of an explanation.
-2. Code that appears in box like the one below can be clicked on and it will automatically be typed in to the appropriate terminal window:
-```.term1
-vim readme.txt
-```
-
-3. Code appearing in windows like the one below is code that you should type in yourself. Usually there will be a unique ID or other bit your need to enter which we cannot supply. Items appearing in <> are the pieces you should substitute based on the instructions.
-```
-docker container start <container ID>
-```
 
 LLVM is already built and installed ($LLVM_PATH) in this environment. The LLVM source code can be found on $LLVM_SRC. A normal LLVM build might take a couple of hours to complete. The next section (section A) is for people who want to learn about how to install LLVM. If you  are just interested in building OpenMP in LLVM please go to [Section B](#openmp). 
 

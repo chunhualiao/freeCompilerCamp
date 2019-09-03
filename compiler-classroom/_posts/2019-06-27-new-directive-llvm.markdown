@@ -26,6 +26,51 @@ Add your name here - <name>
 
 In this tutorial we will cover how to add a new OpenMP directive in Clang/LLVM compiler. The goal of this tutorial is to add a new OpenMP directive -- metadirective (`#pragma omp metadirective [clause[[,]clause]...]`), defined in OpenMP Specification 5.0, that can specify multiple directive variants of which one may be conditionally selected to replace the metadirective based on the enclosing OpenMP context.
 
+A metadirective is an executable directive that 
+* Conditionally resolves to another directive at compile time by selecting from multiple directive variants 
+* Based on traits that define an OpenMP condition or context.
+* Improve performance portability by adapting OpenMP pragmas and user code at compile time.
+
+The syntax of a metadirective has the following format:
+```
+#pragma omp metadirective [clause[[,]clause]...]new-line
+```
+Clause is one of the following
+* when(context-selector-specification: [directive-variant])
+* default(directive-variant)
+
+The following example showing how a metadirective can faciliate compile-time adapation without using the traditional preprocessing directives. 
+
+```
+// Traditional way to enable two versions of OpenMP code using #if-#else. 
+// The same code is duplicated multiple times.
+int v1[N], v2[N], v3[N];
+#if defined(nvptx)     
+ #pragma omp target teams distribute parallel loop map(to:v1,v2) map(from:v3)
+  for (int i= 0; i< N; i++) 
+     v3[i] = v1[i] * v2[i];  
+#else 
+ #pragma omp target parallel loop map(to:v1,v2) map(from:v3)
+  for (int i= 0; i< N; i++) 
+     v3[i] = v1[i] * v2[i];  
+#endif
+
+```
+Using meatadirective, the same code can be written as follows:
+```
+// metadirective supports runtime adaptation using a single copy of code
+int v1[N], v2[N], v3[N];
+#pragma omp target map(to:v1,v2) map(from:v3)
+  #pragma omp metadirective \
+     when(device={arch(nvptx)}: target teams distribute parallel loop)\
+     default(target parallel loop)
+  for (int i= 0; i< N; i++) 
+     v3[i] = v1[i] * v2[i];
+
+```
+
+For more information about metadirective, please consult the OpenMP 5.0 specification.  
+
 ---
 
 ## Step 1 - Locate and go to clang directory

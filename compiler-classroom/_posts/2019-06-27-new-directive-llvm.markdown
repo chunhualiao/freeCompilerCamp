@@ -119,13 +119,13 @@ Now in this file go to the function `ParseOpenMPDeclarativeOrExecutableDirective
 That's it for now. Now let us build and test our code.
 
 ## Step 4 - Building LLVM and testing code
-To build `LLVM` go to the `LLVM_BUILD` directory and run make. We are redirecting the output of make to /dev/null to have a clean output. It will still show errors.
+To build `LLVM` go to the `LLVM_BUILD` directory and run make. We are redirecting the standard output of make to /dev/null to have a clean output. Warning and error messages will still show up if there are any.
 
 ```.term1
 cd $LLVM_BUILD && make -j8 install > /dev/null
 ```
 
-You might get a couple of warnings about `enumeration value 'ompd_metadirective' not handled in switch`. ignore these warnings for now. we will handle them later. Once the code builds successfully and is installed, its time to test a small program. Let us create a new test file:
+This build step may take a few minutes. You might get a couple of warnings about `enumeration value 'ompd_metadirective' not handled in switch`. Please ignore these warnings for now. we will handle them later. Once the code builds successfully and is installed, its time to test a small program. Let us create a new test file:
 
 ```.term1
 cat <<EOF > meta.c

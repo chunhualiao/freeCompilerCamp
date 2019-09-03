@@ -106,9 +106,8 @@ Before parsing the lexer will split the source code into multiple tokens. The pa
 vim lib/Parse/ParseOpenMP.cpp
 ```
 
-Now in this file go to the function `ParseOpenMPDeclarativeOrExecutableDirective`, identify the switch case (line 997) and add a new case for `OMPD_metadirective`. Here we will print out <span style="color:blue">**METADIRECTIVE is caught**</span> and then consume the token.
+Now in this file go to the function `ParseOpenMPDeclarativeOrExecutableDirective`, identify the switch statement (line 997) and add a new case for `OMPD_metadirective` anyweher inside of the body of the switch statement. Here we will print out <span style="color:blue">**METADIRECTIVE is caught**</span> and then consume the token.
 ```
-  switch (DKind) {
   case OMPD_metadirective: {
     llvm::errs() <<"METADIRECTIVE is caught\n";
     ConsumeToken();
@@ -126,14 +125,10 @@ To build `LLVM` go to the `LLVM_BUILD` directory and run make. We are redirectin
 cd $LLVM_BUILD && make -j8 install > /dev/null
 ```
 
-You might get a couple of warnings about `enumeration value 'ompd_metadirective' not handled in switch`. ignore these warnings for now. we will handle them later. Once the code builds successfully and is installed, its time to test a small program. let us get a new test file
+You might get a couple of warnings about `enumeration value 'ompd_metadirective' not handled in switch`. ignore these warnings for now. we will handle them later. Once the code builds successfully and is installed, its time to test a small program. Let us create a new test file:
 
 ```.term1
-wget https://raw.githubusercontent.com/chunhualiao/freecc-examples/master/metadirective/meta.c
-```
-
-now you have a new test file `meta.c` which uses the `metadirective` directive. The content of the file should be as follows:
-```
+cat <<EOF > meta.c
 int main()
 {
 #pragma omp metadirective 
@@ -141,7 +136,10 @@ int main()
     ;
     return 0;
 }
+EOF
 ```
+
+Now you have a new test file `meta.c` which uses the `metadirective` directive. 
 
 Build this file using your Clang compiler.
 

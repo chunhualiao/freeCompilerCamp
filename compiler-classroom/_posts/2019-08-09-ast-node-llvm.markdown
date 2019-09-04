@@ -92,7 +92,8 @@ Next we define the Create and CreateEmpty functions for OMPMetaDirective class. 
 ```.term1
 vim lib/AST/StmtOpenMP.cpp
 ```
-These functions  allocate sufficient memory for the directive and instantiate the required variables. The definition of these functions are self explanatory.
+These functions  allocate sufficient memory for the directive and instantiate the required variables. The definition of these functions are self explanatory. You may have to consult the Doxygen documentation of Clang/LLVM APIs to understand the semantics and parameters of functions being used in the code.  The link is https://llvm.org/doxygen/index.html . 
+
 ```
 OMPMetaDirective *OMPMetaDirective::Create(
     const ASTContext &C, SourceLocation StartLoc, SourceLocation EndLoc,
@@ -120,11 +121,11 @@ OMPMetaDirective *OMPMetaDirective::CreateEmpty(const ASTContext &C,
 
 To define an AST Node, we also need to define all its visitors.
 The major visitors are defined in
-RecursiveASTVisitor.h - This file defines the RecursiveASTVisitor interface, which recursively traverses the entire AST.
-StmtPrinter.cpp - This file implements the Stmt::dumpPretty/Stmt::printPretty methods, which pretty print the AST back out to C code.
-StmtProfile.cpp - This file implements the Stmt::Profile method, which builds a unique bit representation that identifies a statement/expression.
-ASTReaderStmt.cpp - Implements Statements and Expression deserialization.  This implements the ASTReader::ReadStmt method.
-ASTWriterStmt.cpp - Implements serialization for Statements and Expressions.
+* RecursiveASTVisitor.h - This file defines the RecursiveASTVisitor interface, which recursively traverses the entire AST.
+* StmtPrinter.cpp - This file implements the Stmt::dumpPretty/Stmt::printPretty methods, which pretty print the AST back out to C code.
+* StmtProfile.cpp - This file implements the Stmt::Profile method, which builds a unique bit representation that identifies a statement/expression.
+* ASTReaderStmt.cpp - Implements Statements and Expression deserialization.  This implements the ASTReader::ReadStmt method.
+* ASTWriterStmt.cpp - Implements serialization for Statements and Expressions.
 
 
 In `RecursiveASTVisitor.h` file a macro is defined for Stmts to automate iterating over the children defined in children() (every stmt defines these, though sometimes the range is empty).  Each individual Traverse method only needs to worry about children other than those.
@@ -164,11 +165,11 @@ void StmtProfiler::VisitOMPMetaDirective(const OMPMetaDirective *S) {
 
 
 
-Before we define how to read our statement, first we need to create a record for our statement in the `enum StmtCode`. These constants describe the records that describe statements or expressions. These records  occur within type and declarations block, so they begin with record values of 128.  Each constant describes a record for a specific statement or expression class in the AST. To add our own record we modify the StmtCode enum in `ASTBitCodes.h` file. In general we could add our record anywhere in the enum (or where OpenMP directives are defined), but we could not like to upset the current state of the code. So we will add our record at the end of the enum (line 1978).
+Before we define how to read our statement, first we need to create a record for our statement in the `enum StmtCode`. These constants describe the records that describe statements or expressions. These records  occur within type and declarations block, so they begin with record values of 128.  Each constant describes a record for a specific statement or expression class in the AST. To add our own record we modify the StmtCode enum in `ASTBitCodes.h` file. In general we could add our record anywhere in the enum (or where OpenMP directives are defined), but we could not like to upset the current state of the code. So we will add our record at the end of the enum (after line 1977).
 ```.term1
-vim include/clang/Serialization/ASTBitCodes.h +1978
+vim include/clang/Serialization/ASTBitCodes.h +1977
 ```
-Add our record
+Add our record after line 1977
 ```
       STMT_OMP_META_DIRECTIVE,
 ```
@@ -176,9 +177,9 @@ Add our record
 
 In ASTReaderStmt.cpp, expressions are stored in Reverse Polish Notation, with each of the subexpressions preceding the expression they are stored in. Subexpressions are stored from last to first. To evaluate expressions, we continue reading expressions and placing them on the stack, with expressions having operands removing those operands from the stack. Evaluation terminates when we see a STMT_STOP record, and the single remaining expression on the stack is our result.
 ```.term1
-vim lib/Serialization/ASTReaderStmt.cpp
+vim lib/Serialization/ASTReaderStmt.cpp +3396
 ```
-We modify the function `ReadStmtFromStream` to read our statement. We go to the end of the switch case (line 3397) and add our own case where we create an empty OMPMetaDirective statement.
+We modify the function `ReadStmtFromStream` to read our statement. We go to the end of the switch case (line 3396) and add our own case where we create an empty OMPMetaDirective statement.
 ```
     case STMT_OMP_META_DIRECTIVE:
       S = OMPMetaDirective::CreateEmpty(Context,
@@ -313,14 +314,12 @@ Now it is time to call our function from ActOnOpenMPExecutableDirective. Let us 
 ``` 
 We also need to initialize the captured region. For this we add our case in the function ActOnOpenMPRegionStart (line 2483). We will be using the code used to initialize region capture for other directives like parallel or teams,etc.
 ```
-  switch (DKind) {
   case OMPD_metadirective:
-  case OMPD_parallel:
 ```
 
 
 ## Step 3 - Building LLVM and testing code
-To build `LLVM` go to the `LLVM_BUILD` directory and run make. We are redirecting the output of make to /dev/null to have a clean output. It will still show errors.
+To build `LLVM` go to the `LLVM_BUILD` directory and run make. We are redirecting the output of make to /dev/null to have a clean output. Warning and error messages will still show up if there are any.
 
 ```.term1
 cd $LLVM_BUILD && make -j8 install > /dev/null

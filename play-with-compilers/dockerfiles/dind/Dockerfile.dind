@@ -4,12 +4,12 @@ RUN apt update && \
     apt-get update && \
     apt-get -y install git tmux python-pip apache2-utils vim build-essential gettext curl bash-completion bash util-linux jq openssh-client openssl tree cmake man
 
-ENV GOPATH /root/go
-ENV PATH $PATH:$GOPATH
-
 # Adding user freecc
 RUN groupadd -g 9999 freecc && \
     useradd -r -u 9999 -g freecc -m -d /home/freecc freecc
+
+ENV GOPATH /home/freecc/go
+ENV PATH $PATH:$GOPATH
 
 # Install httping
 RUN apt-get -y install httping

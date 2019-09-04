@@ -90,7 +90,6 @@ RUN echo '#!/bin/true' > /sbin/modprobe && chmod +x /sbin/modprobe
 
 # Install a nice vimrc file and prompt (by soulshake)
 COPY ["docker-prompt", "sudo", "/usr/local/bin/"]
-COPY [".vimrc", ".profile", ".inputrc", ".gitconfig", "./root/"]
 COPY ["motd", "/etc/motd"]
 COPY ["daemon.json", "/etc/docker/"]
 
@@ -171,3 +170,5 @@ WORKDIR /home/freecc
 # Setup certs and ssh keys
 RUN mkdir ~/.ssh && ssh-keygen -N "" -t rsa -f ~/.ssh/id_rsa \
     && cat ~/.ssh/id_rsa.pub > ~/.ssh/authorized_keys
+
+COPY [".vimrc", ".profile", ".inputrc", ".gitconfig", "/home/freecc/"]

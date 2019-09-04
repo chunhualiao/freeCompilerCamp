@@ -95,8 +95,8 @@ COPY ["motd", "/etc/motd"]
 COPY ["daemon.json", "/etc/docker/"]
 
 # Remove IPv6 alias for localhost and start docker in the background ...
-CMD cat /etc/hosts >/etc/hosts.bak && \
-    sed 's/^::1.*//' /etc/hosts.bak > /etc/hosts && \
+CMD cat /etc/hosts > /home/freecc/.hosts.bak && \
+    sed 's/^::1.*//' /home/freecc/.hosts.bak > /etc/hosts && \
     sed -i "s/\PWD_IP_ADDRESS/$PWD_IP_ADDRESS/" /etc/docker/daemon.json && \
     sed -i "s/\DOCKER_TLSENABLE/$DOCKER_TLSENABLE/" /etc/docker/daemon.json && \
     sed -i "s/\DOCKER_TLSCACERT/$DOCKER_TLSCACERT/" /etc/docker/daemon.json && \
@@ -105,7 +105,7 @@ CMD cat /etc/hosts >/etc/hosts.bak && \
     mount -t securityfs none /sys/kernel/security && \
     echo "root:root" | chpasswd &> /dev/null && \
     /usr/sbin/sshd -o PermitRootLogin=yes -o PrintMotd=no 2>/dev/null && \
-    dockerd &>/docker.log & \
+    dockerd &> /home/freecc/.docker.log & \
     while true ; do script -q -c "/bin/bash -l" /dev/null ; done
 # ... and then put a shell in the foreground, restarting it if it exits
 

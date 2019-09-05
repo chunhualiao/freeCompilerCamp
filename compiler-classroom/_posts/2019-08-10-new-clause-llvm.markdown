@@ -64,7 +64,9 @@ OPENMP_METADIRECTIVE_CLAUSE(when)
 #undef OPENMP_METADIRECTIVE_CLAUSE
 ```
 
-Above we declared the `when` clause and the class associated with this clause. Next let us declare the class `OMPWhenClause`. We need to declare this in the `OpenMPClause.h` file, located in `include/clang/AST`.
+Above we declared the `when` clause and the class associated with this clause. Please note that for simplicity of this tutorial, we group these new statements into one place. In real development, they should be scattered in separated code regions in the same source file to conform to the existing coding convention.
+ 
+Next let us declare the class `OMPWhenClause`. We need to declare this in the `OpenMPClause.h` file, located in `include/clang/AST`.
 ```.term1
 vim include/clang/AST/OpenMPClause.h +131
 ```
@@ -179,9 +181,9 @@ bool RecursiveASTVisitor<Derived>::VisitOMPWhenClause(OMPWhenClause *C) {
 }
 ```
 
-In the file `TreeTransform.h`, located in `lib/Sema`, goto after the definition of `TreeTransform` (line 3272)
+In the file `TreeTransform.h`, located in `lib/Sema`, goto right before the definition of `TreeTransform` (line 3271)
 ```.term1
-vim lib/Sema/TreeTransform.h +3272
+vim lib/Sema/TreeTransform.h +3271
 ```
 and update the code as follows:
 ```
@@ -191,9 +193,9 @@ OMPClause *TreeTransform<Derived>::TransformOMPWhenClause(OMPWhenClause *C) {
 }
 ```
 
-In the file `OpenMPClause.cpp`, located in `lib/AST`, goto `OpenMP clauses printing method` (line 1062)
+In the file `OpenMPClause.cpp`, located in `lib/AST`, goto `OpenMP clauses printing method` (line 1061)
 ```.term1
-vim lib/AST/OpenMPClause.cpp +1062
+vim lib/AST/OpenMPClause.cpp +1061
 ```
 and update the code as follows:
 ```

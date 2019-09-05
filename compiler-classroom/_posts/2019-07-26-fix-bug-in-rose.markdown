@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Fix a bug in ROSE OpenMP lowering"
+title:  "Fix bugs in ROSE OpenMP runtime and lowering"
 author: "@ouankou"
 date:   2019-07-26
 categories: beginner
@@ -24,24 +24,14 @@ Add your name here - <name>
 
 ## Features
 
-This tutorial is to show how to fix a bug in ROSE compiler.
-
----
-
-Concepts in this exercise:
-# A. Overview
-
-# B. Existing Bug
-
-# C. Fix the Bug
+This tutorial is to show how to fix bugs in ROSE compiler.
 
 ---
 
 ## A. Overview
 
-The bug is mentioned in the issue 35 in official ROSE repository on GitHub (https://github.com/rose-compiler/rose/issues/35).
-
-When ROSE transforms the ```parallel for``` directive, it outlines the pragma body and make multiple calls to this outlined function for different portion of the ```for``` loop. The beginning, ending index and step of ```for``` loop has to be calculated carefully to enforce correct result.
+The bug was reported by a user. When ROSE transforms the ```parallel for``` directive, it outlines the parallel region body and calls a runtime function to fork multiple threads to execute the generated outlined function.  Each thread will execute a different portion of the ```for``` loop. The beginning, ending index and step of ```for``` loop has to be calculated carefully to enforce correct result.
+When there are bugs in either OpenMP lowering or runtime loop scheduler or both, the calculation may result in wrong results. 
 
 Plese execute the following code to prepare solutions for this tutorial and retrive them later.
 
@@ -51,15 +41,13 @@ git remote add sol https://github.com/ouankou/rose.git &&
 git fetch sol
 ```
 
-## B. Existing Bug
+## B. Existing Bugs
 
-1. The declaration of function ```XOMP_loop_default``` and the call to this function have mismatched parameters.
+1. The declaration of OpenMP runtime function ```XOMP_loop_default``` and the call to this function have mismatched parameters.
 
-2. The step of ```for``` loop is calculated incorrectly.
+2. The step of ```for``` loop is calculated incorrectly in OpenMP lowering.
 
-The variables in the ```private``` clause are not initialized, but it's not a bug. The initialization should be done by user but not by compiler.
-
-THe source code is provided in the sandbox. The building configuration has been completed as well. User could follow the steps below to expose the bug and fix it directly.
+First, we try to reproduce the bugs.
 
 #### Show the input
 
@@ -102,18 +90,56 @@ rose-compiler -rose:openmp:lowering -lxomp -lomp bug_parallel_for_in_rose.c
 We can run the line above multiple times and could get different incorrect output but ```3.141593```. Let's see the generated source code.
 
 ```.term1
-cat rose_bug_parallel_for_in_rose.c 
+vim rose_bug_parallel_for_in_rose.c +46
 ```
 
 
-## C. Fix the Bug
+```
+ 35 static void OUT__1__4219__(void *__out_argv)
+ 36 {
+ 37   double *sum = (double *)(((struct OUT__1__4219___data *)__out_argv) -> sum_p);
+ 38   double *step = (double *)(((struct OUT__1__4219___data *)__out_argv) -> step_p);
+ 39   double _p_x;
+ 40   double _p_sum;
+ 41   _p_sum = 0;
+ 42   unsigned int _p_i;
+ 43   long p_index_;
+ 44   long p_lower_;
+ 45   long p_upper_;
+ 46   XOMP_loop_default((unsigned int )0,num_steps - 1,_p_i + ((unsigned int )1),&p_lower_,&p_upper_);
+ 47   for (p_index_ = p_lower_; ((long )p_index_) <= p_upper_; p_index_ = p_index_ + 1) {
+ 48     _p_x = (p_index_ + 0.5) *  *step;
+ 49     _p_sum = _p_sum + 4.0 / (1.0 + _p_x * _p_x);
+ 50   }
+ 51   XOMP_atomic_start();
+ 52    *sum =  *sum + _p_sum;
+ 53   XOMP_atomic_end();
+ 54   XOMP_barrier();
+ 55 }
+```
+At line 46, the default loop scheduler is called to calculate the right bounds assigned to each thread.
+Checking libxomp.h for the prototype of this scheduler: 
+```.term1 
+vim $ROSE_SRC/src/midend/programTransformation/ompLowering/libxomp.h +72
+```
+We can find it has the following form:
+```
+72 extern void XOMP_loop_default(int lower, int upper, int stride, long* n_lower,long* n_upper);
+```
+
+Unfortunately, the third parameter (stride) was wrongfully set to (_p_i + 1) instead of 1.  
+We also notice that the data type should be unsigned int instead of int for lower, upper and stride parameters
+in order to match the desired type by the lowering translation for accepting bigger integers.
+
+
+## C. Fix the Bugs
 
 
 #### Fix the mismatched parameters
 
 Modify the function declaration in the header file:
 ```.term1
-vim $ROSE_SRC/src/midend/programTransformation/ompLowering/libxomp.h
+vim $ROSE_SRC/src/midend/programTransformation/ompLowering/libxomp.h +72
 ```
 On the line 72, the data type for ```lower```, ```upper``` and ```stride``` should be all changed from ```int``` to ```unsigned int```. Then use ```:wq``` to save and quit.
 ```
@@ -131,7 +157,7 @@ cd -
 
 Modify the function in the ```.c``` file:
 ```.term1
-vim $ROSE_SRC/src/midend/programTransformation/ompLowering/xomp.c
+vim $ROSE_SRC/src/midend/programTransformation/ompLowering/xomp.c +574
 ```
 On the line 574, the data type for ```lower```, ```upper``` and ```stride``` should be all changed from ```int``` to ```unsigned int```. Then use ```:wq``` to save and quit.
 ```
@@ -139,7 +165,7 @@ On the line 574, the data type for ```lower```, ```upper``` and ```stride``` sho
 +++574 extern void XOMP_loop_default(unsigned int lower, unsigned int upper, unsigned int stride, long* n_lower,long* n_upper)
 ```
 
-Get solution for this step and your changes will be discarded if the solution is applied:
+Alternatively, you can directly get solution for this step by using a branch with the fixes above:
 
 ```.term1
 cd $ROSE_SRC &&
@@ -148,10 +174,11 @@ cd -
 ```
 
 
-#### Fix the miscalculated loop step
+#### Fix the miscalculated loop stride
+After examining the code, we found that an API function of ROSE AST was used to retrieve the stride of the original loop. But the function had a bug so it retrieved the rhs of the assignment operator of `i=i+1`, instead the one of the add operator. 
 
 ```.term1
-vim $ROSE_SRC/src/frontend/SageIII/sageInterface/sageInterface.C
+vim $ROSE_SRC/src/frontend/SageIII/sageInterface/sageInterface.C +11602
 ```
 
 On the line 11602 and 11607, change the variable ```incr``` to ```arithOp```. Use ```:wq``` to save and quit.
@@ -163,7 +190,7 @@ On the line 11602 and 11607, change the variable ```incr``` to ```arithOp```. Us
 +++11607          stepast=isSgBinaryOp(arithOp)->get_lhs_operand();
 ```
 
-Get solution for this step and your changes will be discarded if the solution is applied:
+Alternatively, you can directly get solution for this step instead of manually changing the source file:
 
 ```.term1
 cd $ROSE_SRC &&
@@ -193,7 +220,14 @@ Run the binary and it shows ```3.141593```.
 
 The generated source code also calculates the loop stride correctly.
 ```.term1
-cat rose_bug_parallel_for_in_rose.c 
+vim rose_bug_parallel_for_in_rose.c +46
+
 ```
+We can see the loop scheduler now has the right stride of value 1 used as its 3rd parameter.
+```
+46   XOMP_loop_default((unsigned int )0,num_steps - 1, (unsigned int )1,&p_lower_,&p_upper_);
+```
+
+
 
 

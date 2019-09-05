@@ -86,13 +86,14 @@ rose-compiler -rose:openmp:lowering -lxomp -lomp bug_parallel_for_in_rose.c
 ```.term1
 ./a.out
 ```
+The execution may crash by triggering a non-negative stride assertion in a runtime function. Or it may generate an incorrect PI value rather than ```3.141593```.  Something is obviously wrong in the compilation.
 
-We can run the line above multiple times and could get different incorrect output but ```3.141593```. Let's see the generated source code.
+Let's see the generated source code.
 
 ```.term1
 vim rose_bug_parallel_for_in_rose.c +46
 ```
-
+We should see code like the following:
 
 ```
  35 static void OUT__1__4219__(void *__out_argv)
@@ -117,8 +118,10 @@ vim rose_bug_parallel_for_in_rose.c +46
  54   XOMP_barrier();
  55 }
 ```
+
 At line 46, the default loop scheduler is called to calculate the right bounds assigned to each thread.
-Checking libxomp.h for the prototype of this scheduler: 
+
+Now exit the editor (:q in vim). We check libxomp.h for the prototype of this scheduler: 
 ```.term1 
 vim $ROSE_SRC/src/midend/programTransformation/ompLowering/libxomp.h +72
 ```
@@ -127,13 +130,14 @@ We can find it has the following form:
 72 extern void XOMP_loop_default(int lower, int upper, int stride, long* n_lower,long* n_upper);
 ```
 
-Unfortunately, the third parameter (stride) was wrongfully set to (_p_i + 1) instead of 1.  
+Unfortunately, the third parameter (stride) was wrongfully set to (_p_i + 1) instead of 1 in rose_bug_parallel_for_in_rose.c:46.  
 We also notice that the data type should be unsigned int instead of int for lower, upper and stride parameters
 in order to match the desired type by the lowering translation for accepting bigger integers.
 
 
 ## C. Fix the Bugs
 
+Before we proceed, we exit the active editor, if any.
 
 #### Fix the mismatched parameters
 
@@ -147,7 +151,7 @@ On the line 72, the data type for ```lower```, ```upper``` and ```stride``` shou
 +++72 extern void XOMP_loop_default(unsigned int lower, unsigned int upper, unsigned int stride, long* n_lower,long* n_upper);
 ```
 
-Get solution for this step and your changes will be discarded if the solution is applied:
+Alternatively, directly get solution for this step without manually fixing the header file:
 
 ```.term1
 cd $ROSE_SRC &&
@@ -205,6 +209,7 @@ First we need to rebuild ROSE to make modification effective.
 ```.term1
 cd $ROSE_BUILD && make core -j4 > /dev/null && make install-core > /dev/null
 ```
+This step may take one minute or two.
 
 #### Generate the output
 ```.term1
@@ -228,6 +233,4 @@ We can see the loop scheduler now has the right stride of value 1 used as its 3r
 46   XOMP_loop_default((unsigned int )0,num_steps - 1, (unsigned int )1,&p_lower_,&p_upper_);
 ```
 
-
-
-
+Congratulations! You have fixed OpenMP implementation bugs.

@@ -42,7 +42,6 @@ Get the example ROSE-based analyzer traversing AST to find loops. Rename it to b
 ```.term1
 wget https://raw.githubusercontent.com/rose-compiler/rose/develop/tutorial/visitorTraversal.C
 mv visitorTraversal.C demo.C
-
 ```
 
 Get a sample makefile
@@ -59,7 +58,7 @@ wget https://raw.githubusercontent.com/rose-compiler/rose/develop/tutorial/input
 
 Prepare the environment variable used to specify where ROSE is installed.
 ```.term1
-export ROSE_HOME=/opt/install/rose_install
+export ROSE_HOME=/home/freecc/install/rose_install
 ```
 
 Build the analyzer

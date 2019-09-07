@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Fix a bugs in ROSE's OpenMP Implementation"
+title:  "Fix a bug in ROSE's OpenMP Implementation"
 author: "@ouankou"
 date:   2019-07-26
 categories: beginner
@@ -33,7 +33,7 @@ This tutorial is to show how to fix bugs in ROSE compiler.
 This bug was reported by a user. When ROSE transforms the ```parallel for``` directive, it outlines the parallel region body and calls a runtime function to fork multiple threads to execute the generated outlined function.  Each thread will execute a different portion of the ```for``` loop. The beginning, ending index and step of ```for``` loop has to be calculated carefully to enforce correct result.
 When there are bugs in either OpenMP lowering or runtime loop scheduler or both, the calculation may result in wrong results. 
 
-Plese execute the following code to prepare solutions for this tutorial and retrive them later.
+Plese execute the following code to check out a version of ROSE with a bug: 
 
 ```.term1
 cd $ROSE_SRC &&
@@ -131,9 +131,9 @@ We can find it has the following form:
 72 extern void XOMP_loop_default(int lower, int upper, int stride, long* n_lower,long* n_upper);
 ```
 
-Obviously, the third parameter is to pass the stride of a loop to be scheduled. However, the generated source code wrongfully sets the stride to be (_p_i + 1) instead of 1 in rose_bug_parallel_for_in_rose.c:46.  
+Obviously, the third parameter is to pass the stride of a loop to be scheduled. However, the generated source code wrongfully sets the stride to be (_p_i + 1) instead of 1 in rose_bug_parallel_for_in_rose.c:46.  Also the variable `_p_i` is uninitialized so Adding 1 to it may result in any values, including a negative one which triggers the non-negative stride runtime assertion failure. 
 
-We now open the ROSE compiler source file doing the code transformation for the parallel for loop (or OpenMP lowering):
+We exit the editor then open a new file: the ROSE compiler source file doing the code transformation for the parallel for loop (or OpenMP lowering):
 ```.term1
 vim $ROSE_SRC/src/midend/programTransformation/ompLowering/omp_lowering.cpp +1559
 ```
@@ -151,6 +151,12 @@ If we search the source code backwards, we can find that `orig_stride` is retrie
 ...
 ```
 The function `isCanonicalForLoop()` is a function within a namespace called `SageInterface` defined in sageInterface.C.  
+We exit the editor and open this file to check why it retrieves the wrong stride expression:
+
+```.term1
+vim $ROSE_SRC/src/frontend/SageIII/sageInterface/sageInterface.C +11462 
+```
+
 After examining the code (shown below), we found that this function had a bug so it retrieved the right-hand side (rhs) operator of the entire increment expression `i=i+1`, instead the rhs of the add operator.
 
 ```
@@ -175,14 +181,13 @@ After examining the code (shown below), we found that this function had a bug so
 11609       }
 
 ``` 
+We are done with the diagnosis of the bug. 
 
 ## D. Fix the Bug
 
-```.term1
-vim $ROSE_SRC/src/frontend/SageIII/sageInterface/sageInterface.C +11602
-```
+You can directly go to 11602 of sageInterface.C to do the fix. 
 
-On the line 11602 and 11607, change the variable ```incr``` to ```arithOp```. Use ```:wq``` to save and quit.
+On the line 11602 and 11607, change the variable ```incr``` to ```arithOp```. 
 ```
 ---11602        stepast=isSgBinaryOp(incr)->get_rhs_operand();
 +++11602        stepast=isSgBinaryOp(arithOp)->get_rhs_operand();
@@ -190,20 +195,22 @@ On the line 11602 and 11607, change the variable ```incr``` to ```arithOp```. Us
 ---11607          stepast=isSgBinaryOp(incr)->get_lhs_operand();
 +++11607          stepast=isSgBinaryOp(arithOp)->get_lhs_operand();
 ```
+Save your changes and quite your editor (e.g. Use ```:wq``` to save and quit for vim).
+
 #### Rebuild and test
 
 First we need to rebuild ROSE to make our modification effective.
 ```.term1
 cd $ROSE_BUILD && make core -j4 > /dev/null && make install-core > /dev/null
 ```
-This step may take one minute or two.
+This step may take one minute or two. Some warnings about Makefile may show up but you can safely ignore them for now. 
 
 #### Generate the output
 ```.term1
 cd $EXAMPLE_DIR && rose-compiler -rose:openmp:lowering -lxomp -lomp bug_parallel_for_in_rose.c
 ```
 
-#### Show the correct output
+#### Test the generated executable
 
 Run the binary and it shows ```3.141593```.
 ```.term1

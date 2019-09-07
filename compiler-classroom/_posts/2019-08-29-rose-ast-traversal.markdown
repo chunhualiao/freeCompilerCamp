@@ -105,7 +105,7 @@ After that, a traversal object is declared at line 44. The object is used to tra
 The traversal object is based on a derived `visitorTraversal` class at line 6. This derived class has member functions to define what should happen during construction (line 14), visiting a node (line 18), and the end of the traversal (line 26).  
 
 
-Get a sample makefile
+Now get a sample makefile to build the source file into an executable file:
 ```.term1
 wget https://raw.githubusercontent.com/rose-compiler/rose/develop/tutorial/SampleMakefile
 ```
@@ -222,7 +222,7 @@ Prepare the environment variable used to specify where ROSE is installed.
 export ROSE_HOME=/home/freecc/install/rose_install
 ```
 
-Build the analyzer
+Build the analyzer:
 ```.term1
 make -f SampleMakefile
 ```

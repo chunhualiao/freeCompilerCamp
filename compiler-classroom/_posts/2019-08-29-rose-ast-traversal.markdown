@@ -45,7 +45,7 @@ mv visitorTraversal.C demo.C
 ```
 We can look into the example analyzer's source code:
 ```.term1
-cat demo.c
+cat demo.C
 ```
 Essentially, we can see the following content:
 ```

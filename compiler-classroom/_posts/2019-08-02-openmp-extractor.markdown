@@ -164,11 +164,6 @@ int main() {
 EOF
 ```
 
-Enter ```OpenMP-Extractor``` build folder.
-```.term1
-cd $HOME/OpenMP-Extractor/lib
-```
-
 Rebuild the binaries of this library within ```OpenMP-Extractor/lib```.
 ```.term1
 make -j4

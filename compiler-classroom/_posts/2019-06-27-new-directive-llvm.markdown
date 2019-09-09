@@ -86,12 +86,12 @@ Now let us update the compiler, such that it just identifies the new directive. 
 1. *OpenMPKinds.def* -- which defines the list of supported OpenMP directives and clauses.
 2. *ParseOpenMP.cpp* -- which implements parsing of all OpenMP directives and clauses.
 
-To define the new directive we will modify the file `OpenMPKinds.def`, located in `include/clang/Basic`. So open the file using your favorite editor. In this tutorial we will be using the vim editor.
+To define the new directive we will modify the file `OpenMPKinds.def`, located in `include/clang/Basic`. So open the file using your favorite editor and go to line 237 (or anywhere before `#undef OPENMP_DIRECTIVE_EXT` is called).
 ```.term1
-vim include/clang/Basic/OpenMPKinds.def
+vim include/clang/Basic/OpenMPKinds.def +237
 ```
 
-Now in this file go to line 237 (or anywhere before `#undef OPENMP_DIRECTIVE_EXT` is called) and add the following new line after it:
+Add the following new line after it:
 ```
 OPENMP_DIRECTIVE_EXT(metadirective, "metadirective")
 ```

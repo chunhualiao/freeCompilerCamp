@@ -101,12 +101,12 @@ In our current state we are not dealing with any clause associated with metadire
 This way we are able to define the new directive `#pragma omp metadirective`.
 
 ## Step 3 - Implement parsing
-Before parsing the lexer will split the source code into multiple tokens. The parser will read these tokens and give a structural representation to them. To implement the parsing of this new directive we need to modify the file `ParseOpenMP.cpp`, located in `lib/Parse`. So open the file using your favorite editor.
+Before parsing the lexer will split the source code into multiple tokens. The parser will read these tokens and give a structural representation to them. To implement the parsing of this new directive we need to modify the file `ParseOpenMP.cpp`, located in `lib/Parse`. Open this file and go to the function `ParseOpenMPDeclarativeOrExecutableDirective`, identify the switch statement (line 997):
 ```.term1
-vim lib/Parse/ParseOpenMP.cpp
+vim lib/Parse/ParseOpenMP.cpp +997
 ```
 
-Now in this file go to the function `ParseOpenMPDeclarativeOrExecutableDirective`, identify the switch statement (line 997) and add a new case for `OMPD_metadirective` anyweher inside of the body of the switch statement. Here we will print out <span style="color:blue">**METADIRECTIVE is caught**</span> and then consume the token.
+Add a new case for `OMPD_metadirective` anyweher inside of the body of the switch statement. Here we will print out <span style="color:blue">**METADIRECTIVE is caught**</span> and then consume the token.
 ```
   case OMPD_metadirective: {
     llvm::errs() <<"METADIRECTIVE is caught\n";

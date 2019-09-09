@@ -30,10 +30,10 @@ This tutorial is to show how to fix bugs in ROSE compiler.
 
 ## A. Overview
 
-This bug was reported by a user. When ROSE transforms the ```parallel for``` directive, it outlines the parallel region body and calls a runtime function to fork multiple threads to execute the generated outlined function.  Each thread will execute a different portion of the ```for``` loop. The beginning, ending index and step of ```for``` loop has to be calculated carefully to enforce correct result.
+When ROSE transforms the ```parallel for``` directive, it outlines the parallel region body and calls a runtime function to fork multiple threads to execute the generated outlined function.  Each thread will execute a different portion of the ```for``` loop. The beginning, ending index and step of ```for``` loop has to be calculated carefully to enforce correct result.
 When there are bugs in either OpenMP lowering or runtime loop scheduler or both, the calculation may result in wrong results. 
 
-Plese execute the following code to check out a version of ROSE with a bug: 
+Plese execute the following code to check out an old version of ROSE with a bug, which was reported by a user: 
 
 ```.term1
 cd $ROSE_SRC &&

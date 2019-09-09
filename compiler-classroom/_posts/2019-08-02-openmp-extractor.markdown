@@ -182,5 +182,8 @@ The last step is check the output:
 ```.term1
 cat test.c.json
 ```
-
+You can see the num_threads(5) is recognized and encoded into the json file as follows:
+```
+25 "num threads":"5",
+```
 Well done, you got it. 

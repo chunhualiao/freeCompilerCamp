@@ -69,42 +69,30 @@ $ which python
 The follow environment variables have already been set in the terminal on the right side. We just need to confirm this: 
 ```
 $ echo $LLVM_SRC
-$ echo LLVM_PATH=<Path where LLVM need to be installed>
+$ echo $LLVM_PATH
 ```
 
+On a personal system, please set these path as following
+```
+export LLVM_SRC=<Path of LLVM source code>
+export LLVM_PATH=<Path where LLVM need to be installed>
+ ```
+
 ### A.3 Download LLVM and Clang
-Go to LLVM_SRC path
-```.term1
-cd $LLVM_SRC
+Note - LLVM is already downloaded into $LLVM_SRC. If you are trying to install in you personal system, run the following commands to download llvm and clang.
+
 ```
-Get the llvm-8.0.0 source file
-```.term1
 wget http://releases.llvm.org/8.0.0/llvm-8.0.0.src.tar.xz
-```
-Untar llvm-8.0.0.src.tar.xz
-```.term1
 tar -xf llvm-8.0.0.src.tar.xz
-```
-Goto llvm-8.0.0.src/tools
-```.term1
+export LLVM_SRC=$PWD/llvm-8.0.0.src
 cd llvm-8.0.0.src/tools
-```
-Get the clang source file
-```.term1
 wget http://releases.llvm.org/8.0.0/cfe-8.0.0.src.tar.xz
-```
-Untar cfe-8.0.0.src.tar.xz 
-```.term1
 tar -xf cfe-8.0.0.src.tar.xz
 ```
-Return back to LLVM_SRC path
-```.term1
-cd $LLVM_SRC
-```
 ### A.4.1 Build with make
-Create a build directory and get into it
+Create a build directory in $HOME and get into it
 ```.term1
-mkdir build && cd build
+mkdir llvm_build && cd llvm_build
 ```
 Run the cmake command. Here we are building llvm-8.0.0 and clang-8.0.0 using make build system.
 CMAKE_BUILD_TYPE specifies the build type on single-configuration generators. Here we are giving the build type as RELEASE. We can also use DEBUG, if we want to build llvm in debug mode.
@@ -114,7 +102,7 @@ CMAKE_INSTALL_PREFIX specifies the install directory used by install command.
 
 Other commonly used parameter are CMAKE_C_COMPILER and CMAKE_CXX_COMPILER for telling make which C compiler to use.
 ```.term1
-cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH $LLVM_SRC/llvm-8.0.0.src
+cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH $LLVM_SRC
 ```
 For boosting performance sometimes we can use the /dev/shm as our temporary directory. /dev/shm is a temporary file storage filesystem, i.e., tmpfs, that uses RAM for the backing store. In an incremental build system a lot of temporary files are created while compilation. /tmp is the location for temporary files as defined in the Filesystem Hierarchy Standard, which is followed by almost all Unix and Linux distributions. This location is access by the TMPDIR environment variable. To make the process of compilation faster we can set the TMPDIR environment variable to point to a tmpfs directory, like /dev/shm. Caution should be taken before enabling this option. If we do not have enough RAM, this step might have an adverse effect on compilation.
 ```.term1
@@ -123,7 +111,7 @@ export TMPDIR=/dev/shm
 Once the required build files are created, we can start building using make. We can create as many threads as the number of processors. For instance, suppose your system has 4 cores on a node. So on this system we can run this command as make -j4. This will speedup the build process. ```WARNING``` - the make command will take a couple of hours to complete.
 
 ```.term1
-make -j4
+make -j8
 ```
 make install installs all the built llvm/clang files to the LLVM_PATH location.
 
@@ -140,11 +128,11 @@ CMAKE_EXPORT_COMPILE_COMMANDS enables or disables output of compile commands dur
 
 The commands used to build using ninja are as follows:
 ```.term1
-cmake -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH $LLVM_SRC/llvm-8.0.0.src
+cmake -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH $LLVM_SRC
 ```
 Once the required build files are created, we can start building using ninja just like before.
-```
-ninja -j<NUM_OF_PROCESSOR>
+```.term1
+ninja -j8
 ```
 ninja install installs all the built llvm/clang files to the LLVM_PATH location.
 ```.term1
@@ -155,42 +143,22 @@ ninja install
 Following environment variables need to be set before using llvm/clang
 ```.term1
 export PATH=$LLVM_PATH:$PATH
-```
-```.term1
 export LD_LIBRARY_PATH=$LLVM_PATH/libexec:$LD_LIBRARY_PATH
-```
-```.term1
 export LD_LIBRARY_PATH=$LLVM_PATH/lib:$LD_LIBRARY_PATH
-```
-```.term1
 export LIBRARY_PATH=$LLVM_PATH/libexec:$LIBRARY_PATH
-```
-```.term1
 export LIBRARY_PATH=$LLVM_PATH/lib:$LIBRARY_PATH
-```
-```.term1
 export MANPATH=$LLVM_PATH/share/man:$MANPATH
-```
-```.term1
 export C_INCLUDE_PATH=$LLVM_PATH/include:$C_INCLUDE_PATH
-```
-```.term1
 export CPLUS_INCLUDE_PATH=$LLVM_PATH/include:CPLUS_INCLUDE_PATH
 ```
+
 Optional environment variables
 ```.term1
 export CLANG_VERSION=8.0.0
-```
-```.term1
 export CLANG_PATH=$LLVM_PATH
-```
-```.term1
 export CLANG_BIN=$LLVM_PATH/bin
-```
-```.term1
 export CLANG_LIB=$LLVM_PATH/lib
 ```
-
 
 ## <a name="openmp"></a> B. Building OpenMP with CMake
 Once llvm is installed building OpenMP is pretty straight forward. Here also we can use ninja or make. Following tutorial is only for make build system.

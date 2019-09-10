@@ -167,6 +167,13 @@ RUN alias ls='ls --color=auto'
 # Move to our home
 WORKDIR /home/freecc
 
+#Install ninja
+RUN wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip
+RUN unzip ninja-linux.zip
+RUN mkdir /home/freecc/bin/
+RUN mv ninja /home/freecc/bin/
+RUN rm ninja-linux.zip
+
 # Setup certs and ssh keys
 RUN mkdir ~/.ssh && ssh-keygen -N "" -t rsa -f ~/.ssh/id_rsa \
     && cat ~/.ssh/id_rsa.pub > ~/.ssh/authorized_keys

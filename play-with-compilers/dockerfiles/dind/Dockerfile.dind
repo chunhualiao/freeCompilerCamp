@@ -126,7 +126,7 @@ RUN mkdir -p $LLVM_SRC && \
     cd $LLVM_SRC && \
     git clone https://github.com/chunhualiao/clang-llvm-tutorials.git . && \
     cd $LLVM_BUILD && \
-    cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH $LLVM_SRC && \
+    cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$LLVM_PATH -DCLANG_BUILD_EXAMPLES=1 $LLVM_SRC && \
     make -j8 install
 
 ENV PATH $LLVM_PATH/bin:$PATH

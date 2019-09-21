@@ -25,7 +25,7 @@ Add your name here - <name>
 ```
 
 ## **Features**
-This is a tutorial about how to write a short plugin in Clang which will print the names of all functions.
+This is a tutorial about how to write a short plugin in Clang which modify the source code as required.
 
 ---
 

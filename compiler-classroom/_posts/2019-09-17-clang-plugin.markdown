@@ -91,6 +91,16 @@ mkdir RenameFunctions
 cd RenameFunctions
 ```
 
+The files for this plugin are available in the freecc-examples github repository.
+`We recommed you to try out the tutorial yourself before downloading the code.`
+If needed you may download it from the repository using the following commands:
+```.term1
+wget https://raw.githubusercontent.com/chunhualiao/freecc-examples/master/plugin/RenameFunctions/RenameFunctions.cpp
+wget https://raw.githubusercontent.com/chunhualiao/freecc-examples/master/plugin/RenameFunctions/CMakeLists.txt
+```
+`If you downloaded the files, skip executing any command in Section B0-B.5. and skip to` [Section C](#building).
+You may still read this section to have an understanding of the plugin.
+
 To write a plugin we need to write the following codes:
 1. A class which creates a PluginASTAction - PluginRenameAction
 2. A class which creates an ASTConsumer - RenameASTConsumer
@@ -124,7 +134,7 @@ using namespace clang;
 using namespace llvm;
 ```
 
-We will also create an instance of the Rewriter class which will be used to edit the original source code and in the end print out the code to the command prompt. Since this instance will be accessed by multiple classes we will make it gobal. So right after the namespace information declare an instance of `Rewriter` on line 19.
+We will also create an instance of the Rewriter class which will be used to edit the original source code and in the end print out the code to the command prompt. Since this instance will be accessed by multiple classes we will make it gobal. So right after the namespace information declare an instance of `Rewriter` on line 16.
 
 ```c++
 Rewriter rewriter;
@@ -135,7 +145,7 @@ First let's create our own custom PluginASTAction, which is merely an abstract b
 It acts as an entry point from which we can invoke our ASTConsumer.
 As the name implies, a PluginASTAction should only be used within the context of a Clang Plugin.
 
-We will create a class named PluginRenameAction (line 21).
+We will create a class named PluginRenameAction (line 18).
 ```c++
 class PluginRenameAction : public PluginASTAction {
 protected:
@@ -169,7 +179,7 @@ In this case, a translation unit effectively represents an entire source file.
 An `ASTContext` class is used to represent the AST for that source file, and it has a ton of useful members (check out its documentation [here](https://clang.llvm.org/doxygen/classclang_1_1ASTContext.html)!)
 
 Since this function is called by the PluginRenameAction class, let us put its definition before that. 
-So add the following code on line 21.
+So add the following code on line 18.
 
 ```c++
 class RenameASTConsumer : public ASTConsumer {
@@ -214,7 +224,9 @@ Clang also offers a brief [official tutorial](http://clang.llvm.org/docs/RAVFron
 For such *Visit* functions, you must return true to continue traversing the AST (examining other nodes) and return false to halt the traversal entirely and essentially exit Clang.
 You shouldn’t ever call any of the *Visit* functions directly; instead call TraverseDecl (like we did in our RenameASTConsumer above), which will call the correct *Visit* function behind the scenes.
 
-Based on our objective of rewriting function definitions and statements, we only need to override `VisitFunctionDecl` and `VisitStmt`. Again this class is referenced by the AST Consumer class (`RenameASTConsumer`). So let us define it before that class (line 21).
+Based on our objective of rewriting function definitions and statements, we only need to override `VisitFunctionDecl` and `VisitStmt`.
+Again this class is referenced by the AST Consumer class (`RenameASTConsumer`).
+So let us define it before that class (line 18).
 
 ```c++
 class RenameVisitor : public RecursiveASTVisitor<RenameVisitor> {
@@ -262,7 +274,8 @@ We also used it at the end of our *PluginASTAction's* CreateASTConsumer function
 Using Rewriter means that you need to find the correct SourceLocation to insert/replace text.
 Understanding which location to choose (getLocation(), getLocStart(), etc) can be difficult, so I’ve explained several common types of location getters in this post.
 
-Also, note the use of dyn_cast to check whether the Stmt st is a ReturnStmt or a CallExpr. Click [here](http://llvm.org/docs/ProgrammersManual.html#the-isa-cast-and-dyn-cast-templates) to read more about dyn_cast.
+Also, note the use of dyn_cast to check whether the Stmt st is a ReturnStmt or a CallExpr.
+Click [here](http://llvm.org/docs/ProgrammersManual.html#the-isa-cast-and-dyn-cast-templates) to read more about dyn_cast.
 
 ### **B.4 Register the plugin**
 We also need to register our Plugin so that Clang can call it during the build process. This is simple to do:
@@ -270,7 +283,8 @@ We also need to register our Plugin so that Clang can call it during the build p
 static FrontendPluginRegistry::Add<PluginRenameAction>
     X("-rename-plugin", "simple Plugin example");
 ```
-This is standard procedure for all Clang Plugins and should go at the bottom of the file. Registering your Plugin requires two inputs:
+This is standard procedure for all Clang Plugins and should go at the bottom of the file.
+Registering your Plugin requires two inputs:
 1. A command-line argument string that will be used to invoke your Plugin. Above, we used `"-rename-plugin"`, so we can invoke our Plugin with *"-rename-plugin"* later.
 2. A description of what your Plugin does ("simple Plugin example").
 
@@ -293,22 +307,24 @@ EOF
 ```
 Here we are instructing the build system to create a library RenameFunctions for the clang plugin. This is the library that we will link our plugin.
 
-### **B.6 Include plugin in build**
-We also need to include our plugin to be built by LLVM. For that we will add a subdirectory into the CMakeLists.txt file of the example directory.
+
+## <a name="building"></a> **C Building and Testing**
+
+### **C.1 Include plugin in build**
+Before we build we need to include our plugin to be built by LLVM. For that we will add a subdirectory into the CMakeLists.txt file of the example directory.
 ```.term1
 echo "add_subdirectory(RenameFunctions)" >> ../CMakeLists.txt
 ```
 This will make sure that CMake considers our plugin for build.
 
-## **C Building and Testing**
+### **C.2 Build**
 Next step is to build our plugin. Since we modified the clang source code, this step is easier. We just need to go to the location of our LVM_BUILD and run the make command. This is recognize that we have added a new directory for build and will build our plugin. Here we are running the make install command to finally install our library into the location where LLVM is installed.
 ```.term1
 cd $LLVM_BUILD
 make -j8 install > /dev/null
 ```
 
-
-#### **Testing**
+### **C.3 Testing**
 Next comes the task to test our plugin. Remember we created a file in the beginning called saxpy.c. Lets check that file again.
 ```.term1
 cd

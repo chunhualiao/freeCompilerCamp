@@ -51,20 +51,11 @@ Do not use Clang Plugins when you…:
 Let's say that you want to analyze a simple C file. Let us create a C file, saxpy.c, as follows:
 ```.term1
 cat << EOF > saxpy.c
-int func1(int x, int y)
-{
-  return x+y;
-}
+int func1(int x, int y) { return x+y; }
 
-int func2(int x, int y)
-{
-  return x*y;
-}
+int func2(int x, int y) { return x*y; }
 
-int saxpy(int a, int x, int y) 
-{
-  return func1(func2(a,x),y);
-}
+int saxpy(int a, int x, int y) { return func1(func2(a,x),y); }
 EOF
 ```
 
@@ -185,6 +176,19 @@ So add the following code on line 18.
 class RenameASTConsumer : public ASTConsumer {
 private:
     RenameVisitor *visitor; // doesn't have to be private
+
+    // Function to get the base name of the file provided by path
+    string basename(std::string path) {
+        return std::string( std::find_if(path.rbegin(), path.rend(), MatchPathSeparator()).base(), path.end());
+    }
+
+    // Used by std::find_if
+    struct MatchPathSeparator
+    {
+        bool operator()(char ch) const {
+            return ch == '/';
+        }
+    };
  
 public:
     explicit RenameASTConsumer(CompilerInstance *CI)
@@ -192,14 +196,22 @@ public:
         { }
  
     virtual void HandleTranslationUnit(ASTContext &Context) {
-        errs() << "File before parsing\n";
-        rewriter.getEditBuffer(rewriter.getSourceMgr().getMainFileID()).write(errs());
-        errs() << "##########################################\nAnalyzing the file\n";
         visitor->TraverseDecl(Context.getTranslationUnitDecl());
-        errs() << "##########################################\n";
-        errs() << "File after parsing\n";
-        errs() << "##########################################\n";
-        rewriter.getEditBuffer(rewriter.getSourceMgr().getMainFileID()).write(errs());
+
+        // Create an output file to write the updated code
+        FileID id = rewriter.getSourceMgr().getMainFileID();
+        string filename = "/tmp/" + basename(rewriter.getSourceMgr().getFilename(rewriter.getSourceMgr().getLocForStartOfFile(id)).str());
+        std::error_code OutErrorInfo;
+        std::error_code ok;
+        llvm::raw_fd_ostream outFile(llvm::StringRef(filename),
+            OutErrorInfo, llvm::sys::fs::F_None);
+        if (OutErrorInfo == ok) {
+            const RewriteBuffer *RewriteBuf = rewriter.getRewriteBufferFor(id);
+            outFile << std::string(RewriteBuf->begin(), RewriteBuf->end());
+            errs() << "Output file created - " << filename << "\n";
+        } else {
+            llvm::errs() << "Could not create file\n";
+        }
     }
 };
 ```
@@ -349,3 +361,14 @@ If we ignore the Xclangs the command becomes much clear:
 clang -load RenameFunctions.so -plugin -rename-plugin -c saxpy.c
 ```
 
+Once your build is successful it will say
+```
+Output file created - /tmp/saxpy.c
+```
+
+Let us print out the output file to check if the plugin works
+```.term1
+cat /tmp/saxpy.c
+```
+
+<span style="color:green">**Congratulations**</span> you were successfully able to create a new plugin in Clang.

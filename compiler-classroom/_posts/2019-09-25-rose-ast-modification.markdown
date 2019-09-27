@@ -23,23 +23,18 @@ Add your name here - <name>
 ```
 
 ## Features
-This is a tutorial to build your own tool modifying ROSE AST on demand.
+This is a tutorial to build your own source code translator by modifying ROSE AST.
 
 ---
 
 # A. Overview
-An common task in compiler development is to updating the existing AST to conduct program analysis and transformation. ROSE includes different helper functions from SageBuilder and SageInterface namespaces for this purpose.
+A common task in compiler development is to modify the existing AST to conduct code transformation. ROSE includes different API functions from the SageBuilder and SageInterface namespaces for this purpose. A complete list of these functions can be viewed at DoxyGen docs of ROSE at http://rosecompiler.org/ROSE_HTML_Reference/index.html .
 
-The goal of this tutorial is to learn how to use the ROSE AST modification API to insert a function call and generate new source code. 
+The goal of this tutorial is to learn how to use the ROSE AST transformation API to insert a function call and generate the output source code. 
 
-# B. Get the source files and makefile
+# B. Get the source files 
 
-Enter the build folder and compiler the sample program that inserts a dummy function call to the input.
-
-```.term1
-cd /home/freecc/build/rose_build/tests/nonsmoke/functional/roseTests/astInterfaceTests/
-make buildFunctionCalls
-```
+Enter the build folder and check the sample program that inserts a dummy function call to the input.
 
 For more details, we can check the source code for this sample program.
 
@@ -47,8 +42,8 @@ For more details, we can check the source code for this sample program.
 cat /home/freecc/source/rose_src/tests/nonsmoke/functional/roseTests/astInterfaceTests/buildFunctionCalls.C
 ```
 
-A general function call contains return type, function name and parameters. We'll define them all. After creating a new node based on those information, we add the node to the existing AST tree.
-In the source file, line 35-44 are the essential code to insert the new function call. Line 36 claims the return type for the new function. Line 37-39 are creating its parameter list. Line 40 generates a statement of function call. Finally, line 44 inserts this function call right before the return statement in the main function.
+A C function call contains a return type, function name and one or more parameters. We'll build a new piece of AST for all of them. After creating a new subtree based on those information, we attach the subtree to the existing AST tree.
+In the source file, line 35-44 are the essential code to insert the new function call. Line 36 claims the return type for the new function. Line 37-39 create its parameter list. Line 40 generates a statement of function call. Finally, line 44 inserts this function call right before the return statement in the main function.
 
 ```
 ...
@@ -65,7 +60,7 @@ In the source file, line 35-44 are the essential code to insert the new function
 ...
 ```
 
-Afer building the tool, we'll prepare an input file for testing.
+Afer writing the source code for the translation tool, we'll prepare an input file for testing.
      
 ```.term1
 wget https://raw.githubusercontent.com/passlab/rose/release/tests/nonsmoke/functional/roseTests/astInterfaceTests/inputbuildFunctionCalls.C
@@ -95,20 +90,25 @@ Essentially, we can see the following content:
 14 }
 ```
 
-# C. Run sample program to insert a function call
+# C. Run the translator tool
 
+Build the tool: 
+```.term1
+cd /home/freecc/build/rose_build/tests/nonsmoke/functional/roseTests/astInterfaceTests/
+make buildFunctionCalls
+```
 
-After building the demo, there is executable file named ```buildFunctionCalls``` under the current directory:
+After building the tool, there is an executable file named ```buildFunctionCalls``` under the current directory:
 ```.term1
 ls buildFunctionCalls
 ```
 
-Finally, run the demo tool to insert the function call to the sample  input code:
+Finally, run the tool to insert the function call into the sample input code:
 
 ```.term1
 ./buildFunctionCalls -c inputbuildFunctionCalls.C
 ```
-The generated source code still has the same name but wiht a prefix ```rose_```. It's unparsed from updated AST.
+The generated source code still has the same name but wiht a prefix ```rose_```. It's unparsed from the updated AST.
 Be checking the new source code, it clearly shows that ```foo()``` is called with parameter ```p_sum``` now.
 
 ```.term1

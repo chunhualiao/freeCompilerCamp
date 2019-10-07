@@ -18,3 +18,8 @@ Goal: an open, extensive online platform to automatically train and certify comp
 This work was performed under the auspices of the U.S. Department of Energy by Lawrence Livermore National Laboratory under Contract DE-AC52-07NA27344, and partially supported by the U.S. Dept. of Energy, Office of Science, ASCR SC-21), under contract DE-AC02-06CH11357. 
 
 This website is still under development (LLNL-WEB-789932). For questions and comments, please file issue tickets to this git repo. Alternatively, you can contact liao6@llnl.gov .
+
+# Publication
+List
+* Anjia Wang, Alok Mishra, Chunhua Liao, Yonghong Yan, Barbara Chapman, FreeCompilerCamp.org: Training for OpenMP Compiler Development from Cloud, Sixth SC Workshop on Best Practices for HPC Training and Education: BPHTE19, 2019
+* Alok Mishra, Anjia Wang, Chunhua Liao, Yonghong Yan, Barbara Chapman, FreeCompilerCamp: Online Training for Extending Compilers, SC'19 Research Poster submission, accepted (also selected as a Best Poster nominee).

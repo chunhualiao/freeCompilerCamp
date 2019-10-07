@@ -24,13 +24,17 @@ Add your name here - <name>
 
 ## Features
 
-This tutorial is to show how to fix bugs in ROSE compiler.
+This tutorial is to show how to fix OpenMP implementation bugs in ROSE compiler.
 
 ---
 
 ## A. Overview
 
-When ROSE transforms the ```parallel for``` directive, it outlines the parallel region body and calls a runtime function to fork multiple threads to execute the generated outlined function.  Each thread will execute a different portion of the ```for``` loop. The beginning, ending index and step of ```for``` loop has to be calculated carefully to enforce correct result.
+When ROSE transforms (also called lowers) the ```omp parallel for``` directive, there are several steps involved:
+* The compiler outlines the parallel region into an outlined function (usually named OUT__X_xxx(...)).
+* Inside the outlined function, each thread will execute a different portion of the ```for``` loop. The beginning, ending index and step of ```for``` loop has to be calculated carefully to enforce correct result. This calculation is performed by a runtime library call doing loop scheduling (e.g. XOMP_loop_default(...)). ROSE inserts a call to this loop scheduling function right before the loop to obtain the right index range and step (or stride). 
+* The compiler finally replaces the original parallel region with another runtime call (named XOMP_parallel_start(..)) which accepts a function pointer to the outlined function. This runtime function will fork multiple threads to execute the generated outlined function. 
+
 When there are bugs in either OpenMP lowering or runtime loop scheduler or both, the calculation may result in wrong results. 
 
 Plese execute the following code to check out an old version of ROSE with a bug, which was reported by a user: 
@@ -227,4 +231,4 @@ We can see the loop scheduler now has the right stride of value 1 used as its 3r
 46   XOMP_loop_default(0,num_steps - 1, 1,&p_lower_,&p_upper_);
 ```
 
-Congratulations! You have fixed OpenMP implementation bugs.
+Congratulations! You have learnt how to fix OpenMP implementation bugs.

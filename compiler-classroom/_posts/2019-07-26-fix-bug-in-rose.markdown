@@ -30,6 +30,8 @@ This tutorial is to show how to fix OpenMP implementation bugs in ROSE compiler.
 
 ## A. Overview
 
+![OpenMP Lowering by ROSE, using PI as an example](/images/rose-omp-lowering-pi.png)
+
 When ROSE transforms (also called lowers) the ```omp parallel for``` directive, there are several steps involved:
 * The compiler outlines the parallel region into an outlined function (usually named OUT__X_xxx(...)).
 * Inside the outlined function, each thread will execute a different portion of the ```for``` loop. The beginning, ending index and step of ```for``` loop has to be calculated carefully to enforce correct result. This calculation is performed by a runtime library call doing loop scheduling (e.g. XOMP_loop_default(...)). ROSE inserts a call to this loop scheduling function right before the loop to obtain the right index range and step (or stride). 

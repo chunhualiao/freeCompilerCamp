@@ -138,7 +138,7 @@ The major visitors are defined in
 
 In `RecursiveASTVisitor.h` file a macro is defined for Stmts to automate iterating over the children defined in children() (every stmt defines these, though sometimes the range is empty).  Each individual Traverse method only needs to worry about children other than those.
 
-To define our own traverse method for metadirective, we will use this macro. We wil add our traverse method after the definition of the macro `DEF_TRAVERSE_STMT` (ends at line 2118).
+To define our own traverse method for `allocate`, we will use this macro. We wil add our traverse method after the definition of the macro `DEF_TRAVERSE_STMT` (ends at line 2118).
 ```.term1
 vim include/clang/AST/RecursiveASTVisitor.h +2119
 ```
@@ -154,7 +154,7 @@ vim lib/AST/StmtPrinter.cpp +641
 And add our definition of VisitOMPAllocateDirective
 ```
 void StmtPrinter::VisitOMPAllocateDirective(OMPAllocateDirective *Node) {
-  Indent() << "#pragma omp metadirective";
+  Indent() << "#pragma omp allocate";
   PrintOMPExecutableDirective(Node);
 }
 ```
@@ -277,13 +277,13 @@ and add a case in the switch statement (towards the end) of getOpenMPCaptureRegi
 
 Going back to our parsing (ParseOpenMP.cpp), you can see that to create the Directive we used the function `ActOnOpenMPExecutableDirective`. 
 This function (defined in the file `SemaOpenMP.cpp`), tells how to act on an OpenMP executable directive. 
-We will modify this function to handle our case for metadirective. 
-First we need to define how to act on OpenMP metadirective directive. 
+We will modify this function to handle our case for `allocate`. 
+First we need to define how to act on OpenMP allocate directive. 
 We declare our function `ActOnOpenMPAllocateDirective` in the header file `Sema.h` as part of the class Sema and provide its definition in `SemaOpenMP.cpp`. 
 ```.term1
 vim include/clang/Sema/Sema.h +8849
 ```
-The function ActOnOpenMPAllocateDirective is called on well-formed '\#pragma omp metadirective' after parsing of the  associated statement.
+The function ActOnOpenMPAllocateDirective is called on well-formed '\#pragma omp allocate' after parsing of the  associated statement.
 ```
   StmtResult ActOnOpenMPAllocateDirective(ArrayRef<OMPClause *> Clauses,
                                       SourceLocation StartLoc,

@@ -2,7 +2,7 @@
 layout: post
 title:  "How to add a new OpenMP directive in Clang/LLVM compiler"
 author: "@alokmishra.besu"
-date:   2019-10-19
+date:   2019-10-18
 categories: beginner
 tags: [llvm,clang,openmp,directive]
 ---

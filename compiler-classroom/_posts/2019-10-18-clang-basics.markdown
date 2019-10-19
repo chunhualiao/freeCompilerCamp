@@ -7,7 +7,8 @@ categories: beginner
 tags: [clang,preprocessor,compiler,ast,traversal,lowering]
 ---
 
-## Tips:
+## **Tips:**
+
 Code snippets are shown in one of three ways throughout this environment:
 
 1. Code that looks like `this` is sample code snippets that is usually part of an explanation.

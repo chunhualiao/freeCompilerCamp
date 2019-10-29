@@ -14,6 +14,10 @@ Goal: an open, extensive online platform to automatically train and certify comp
     * Dockerfile.middle - In this docker file we add the user and user group required for the docker environment. This file is dependent upon fcc_docker:0.1, which is an image built from Dockerfile.base.
     * Dockerfile.dind - This is the main docker file. This is the file where we up setup our environment, add required tools, like LLVM and ROSE, etc. This file is dependent upon fcc_dind:0.1, which is an image buikt from Dockerfile.middle.
 
+# Installation
+You can install your own instance of this website. Please follow instructions at 
+* https://github.com/chunhualiao/freeCompilerCamp/wiki/Deploy-FreeCC-to-AWS
+
 # Contact Us
 This work was performed under the auspices of the U.S. Department of Energy by Lawrence Livermore National Laboratory under Contract DE-AC52-07NA27344, and partially supported by the U.S. Dept. of Energy, Office of Science, ASCR SC-21), under contract DE-AC02-06CH11357. 
 

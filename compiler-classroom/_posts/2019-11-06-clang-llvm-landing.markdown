@@ -7,9 +7,9 @@ tags: [clang,llvm,compiler,landing]
 categories:
 terms: 0
 ---
-This series of tutorials will 
+This series of tutorials will help you
   
-  * Get you familiar with the key concepts of clang/llvm
+  * Get familiar with the key concepts of clang/llvm
 
   * Write your own code analyzers
 

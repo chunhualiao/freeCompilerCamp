@@ -7,9 +7,9 @@ tags: [rose,compiler,landing]
 categories:
 terms: 0
 ---
-This series of tutorials will 
+This series of tutorials will help you 
   
-  * Get you familiar with the key concepts of ROSE
+  * Get familiar with the key concepts of ROSE
 
   * Write your own code analyzers
 

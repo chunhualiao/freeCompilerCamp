@@ -6,8 +6,7 @@ While this platform can be used to host any compiler tutorials, we specially col
 # Directory Layout
 Goal: an open, extensive online platform to automatically train and certify compiler researchers and developers.
 * compiler-classroom: the website's text content
- index.html  : the home page of the webpage
-  * _posts  : a directory contains the markdown files for individual tutorials
+  * moved to https://github.com/freeCompilerCamp/freecompilercamp.github.io
 * play-with-compiler: the online sandbox based on play-with-docker
   * dockerfiles/dind/ : a directory contains docker files for our online sandboxed terminal
     * Dockerfile.base - This is the base docker file which loads the ubuntu environment.

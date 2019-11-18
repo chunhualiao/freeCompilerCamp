@@ -3,15 +3,12 @@
 
 While this platform can be used to host any compiler tutorials, we specially collect some tutorials for OpenMP compilers. We have created some initial tutorials to train users to learn how to use the ROSE or Clang/LLVM compiler to support OpenMP.
 
-# Directory Layout
+# Project Layout
 Goal: an open, extensive online platform to automatically train and certify compiler researchers and developers.
 * compiler-classroom: the website's text content
-  * moved to https://github.com/freeCompilerCamp/freecompilercamp.github.io
+  * Moved to https://github.com/freeCompilerCamp/freecompilercamp.github.io
 * play-with-compiler: the online sandbox based on play-with-docker
-  * dockerfiles/dind/ : a directory contains docker files for our online sandboxed terminal
-    * Dockerfile.base - This is the base docker file which loads the ubuntu environment.
-    * Dockerfile.middle - In this docker file we add the user and user group required for the docker environment. This file is dependent upon fcc_docker:0.1, which is an image built from Dockerfile.base.
-    * Dockerfile.dind - This is the main docker file. This is the file where we up setup our environment, add required tools, like LLVM and ROSE, etc. This file is dependent upon fcc_dind:0.1, which is an image buikt from Dockerfile.middle.
+  * Moved to https://github.com/freeCompilerCamp/play-with-compiler
 
 # Installation
 You can install your own instance of this website. Please follow instructions at 
